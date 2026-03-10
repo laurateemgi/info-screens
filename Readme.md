@@ -13,7 +13,8 @@ npm install express socket.io dotenv
 
 node server.js 
 
-(kui sul pole Node projekti kaustas või ei saa pathi normilt kätte võib ka info-screens folderis shift+paremklikk & open powershell window here ning command sinna).
+(kui sul pole Node projekti kaustas või ei saa pathi normilt kätte, sest wsl remote on retarded pathiga, siis võib ka info-screens folderis shift+paremklikk & open powershell window here ning command sinna).
 
 # Seejärel browseris http://localhost:3000 või http://localhost:3000/front-desk.html etc etc.
 
+# .env
