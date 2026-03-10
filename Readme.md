@@ -18,3 +18,5 @@ node server.js
 # Seejärel browseris http://localhost:3000 või http://localhost:3000/front-desk.html etc etc.
 
 # .env -s on key'd, mida pole hea tava git-i pushida.
+
+#package-lock.json on autogen fail, mille kohta ma ei oska midagi öelda
