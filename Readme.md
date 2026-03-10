@@ -17,4 +17,4 @@ node server.js
 
 # Seejärel browseris http://localhost:3000 või http://localhost:3000/front-desk.html etc etc.
 
-# .env
+# .env -s on key'd, mida pole hea tava git-i pushida.
