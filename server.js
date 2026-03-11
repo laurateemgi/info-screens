@@ -22,7 +22,7 @@ const io = new Server(server);
 app.use(express.static("public"));
 
 app.get('/', (req, res) => {
-  res.send('<h1>info-screens TBD</h1>');
+  res.send('<h1>info-screens TBD</h1>'); // 1.2.1 kommentaariks juurde, et see on lihtsalt localhost 3000 testimiseks. Html lehed praegu tühjad, aga laevad ära.
 });
 
 server.listen(3000, () => {
@@ -30,7 +30,7 @@ server.listen(3000, () => {
 });
 
 
-// 1.1 immutable shared server state
+// 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
   sessions: [],
   currentSession: null,
@@ -43,8 +43,6 @@ const state = {
   lastFinishedSession: null
 };
 // 1.1 npm start ja npn run dev on package.jsonis olemas, aga need sõltuvad actual timer funktsioonist
-// 1.1 ja selleni peaks graafiku kohaselt jõudma ülehomme (vb homme, sest homme tundub lihtsam ja te muidu ei saa töötada)
-
 
 // 1.1 socket.io ühendus
 io.on("connection", (socket) => {
@@ -55,6 +53,33 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
+  // 1.2.1 leidsin selle socket event template'i otsides & võiks vajalik olla imo:
+  socket.on('error', (err) => {
+    console.error(`Socket error from ${socket.id}:`, err);
+  });
 });
 
-// 1.1 all-in-all, teha on ülipalju, aga thank god, et tööjaotused on bite-sized
+// 1.2.1 panen üleüldise eventide asetuse paika (hetkel kommentaaridena, sest evendid poolikud & muidu ei saa localhost asju testida ja viskab nodes errorisse)
+
+//socket.on("verifyKey", () => {});
+
+//socket.on("createSession", () => {});
+
+//socket.on("deleteSession", () => {});
+
+//socket.on("addDriver", () => {});
+
+//socket.on("removeDriver", () => {});
+
+//1.2.1 hiljemalt siia peaks timeri tegema, sest race'il seda ju vaja
+
+//socket.on("startRace", () => {});
+
+//socket.on("setFlag", () => {});
+
+//socket.on("recordLap", () => {});
+
+//socket.on("finishRace", () => {});
+
+//socket.on("endSession", () => {});
+// 1.2.1 
