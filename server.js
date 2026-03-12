@@ -12,6 +12,7 @@ if (
 
 // 1.1 copy-paste mix&match expressi + socketi kodukatelt, ehk siis serveri skeleton
 const express = require("express");
+const { stat } = require("fs");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -70,7 +71,7 @@ socket.on("verifyKey", ({role, key}) => {
     safety: process.env.SAFETY_KEY,
     observer: process.env.OBSERVER_KEY
   };
-  
+
   setTimeout(() => {
         const success = key === roleKeys[role];
         socket.emit("authResult", {success});
@@ -78,24 +79,111 @@ socket.on("verifyKey", ({role, key}) => {
 
 });
 
-//socket.on("createSession", () => {});
+//1.2.3 all poolikud evendid. conditionale veel juurde vaja.
+socket.on("createSession", () => {   //1.2.3
+  const id = "session-" + (state.sessions.length + 1);
 
-//socket.on("deleteSession", () => {});
+  const session = {id, drivers: []};
 
-//socket.on("addDriver", () => {});
+  state.sessions.push(session);
 
-//socket.on("removeDriver", () => {});
+  io.emit("sessionsUpdated", state.sessions);
+});
 
-//1.2.1 hiljemalt siia peaks timeri tegema, sest race'il seda ju vaja
+socket.on("deleteSession", (sessionId) => {   //1.2.3
 
-//socket.on("startRace", () => {});
+  state.sessions = state.sessions.filter(s => s.id !== sessionId);
+  
+  io.emit("sessionsUpdated", state.sessions);
 
-//socket.on("setFlag", () => {});
+});
 
-//socket.on("recordLap", () => {});
+socket.on("addDriver", ({sessionId, driverName}) => { // 1.2.3
 
-//socket.on("finishRace", () => {});
+  const session = state.sessions.find(s => s.id === sessionId);
+  const carNumber = session.drivers.length + 1;
+  
+  session.drivers.push({name: driverName, carNumber});
 
-//socket.on("endSession", () => {});
+  io.emit("sessionsUpdated", state.sessions);
+
+});
+
+socket.on("removeDriver", ({sessionId, driverName}) => { //1.2.3
+  
+  const session = state.sessions.find(s => s.id === sessionId);
+
+  session.drivers = session.drivers.filter(d => d.name !== driverName);
+
+  io.emit("sessionsUpdated", state.sessions);
+});
+
+socket.on("startRace", () => { //1.2.3
+
+  state.currentSession = state.sessions.shift();
+  state.nextSession = state.sessions[0] || null;
+  state.raceStarted = true;
+  state.raceEnded = false;
+  state.raceMode = "SAFE";
+
+  setupLapTracking();
+  startTimer();
+
+  io.emit("raceStarted", state);
+});
+
+socket.on("setFlag", (mode) => { //1.2.3
+
+  state.raceMode = mode;
+
+  io.emit("flagChanged", mode);
+});
+
+socket.on("recordLap", (carNumber) => { //1.2.3
+
+  const now = Date.now();
+  const lapData = state.laps[carNumber];
+
+  const lapTime = now - lapData.lastlap
+  lapData.lap++;
+
+  if (!lapData.fastest || lapTime < lapData.fastest)
+  {lapData.fastest = lapTime;}
+
+  lapData.lastLap = now;
+
+  io.emit("leaderBoardUpdated", state.laps);
+
+});
+
+socket.on("finishRace", () => {finishRace()}); //1.2.3
+
+socket.on("endSession", () => {  //1.2.3
+
+  state.lastFinishedSession = state.currentSession;
+  state.currentSession = null;
+  state.raceStarted = false;
+  state.raceEnded = false;
+  state.raceMode = "DANGER";
+  state.timer = 0;
+  state.laps = {};
+
+  io.emit("stateUpdated", state);
+});
+
 // 1.2.1 
 }); //1.2.2 tõstsin kõik evendid io.on(connection) alla
+
+// 1.2.3 functionid s.t. timer jne peavad olema io.on(connection)-st eraldi
+// 1.2.3 veel pole jõudnud functione teha
+function startTimer() {
+
+}
+
+function finishRace() {
+
+}
+
+function setupLapTracking() {
+
+}
