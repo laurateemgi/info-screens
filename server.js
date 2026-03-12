@@ -57,11 +57,26 @@ io.on("connection", (socket) => {
   socket.on('error', (err) => {
     console.error(`Socket error from ${socket.id}:`, err);
   });
+
+
+// 1.2.1 panen üleüldise eventide asetuse paika (
+// kui tahate localhosti testida, siis muutke allolev kommentaarideks, sest evendid poolikud & muidu ei saa localhost asju testida ja viskab nodes errorisse)
+
+//1.2.2 verifyKey (also kõik evendid incl verifyKey peavad jääma ülaloleva io.on(connection) alla)
+socket.on("verifyKey", ({role, key}) => {
+  
+  const roleKeys = {
+    receptionist: process.env.RECEPTIONIST_KEY,
+    safety: process.env.SAFETY_KEY,
+    observer: process.env.OBSERVER_KEY
+  };
+  
+  setTimeout(() => {
+        const success = key === roleKeys[role];
+        socket.emit("authResult", {success});
+  }, 500);
+
 });
-
-// 1.2.1 panen üleüldise eventide asetuse paika (hetkel kommentaaridena, sest evendid poolikud & muidu ei saa localhost asju testida ja viskab nodes errorisse)
-
-//socket.on("verifyKey", () => {});
 
 //socket.on("createSession", () => {});
 
@@ -83,3 +98,4 @@ io.on("connection", (socket) => {
 
 //socket.on("endSession", () => {});
 // 1.2.1 
+}); //1.2.2 tõstsin kõik evendid io.on(connection) alla
