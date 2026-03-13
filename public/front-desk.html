@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Front Desk</title> <!--/shown in browser tab -->
+  <style>
+li {
+  max-width: 400px;
+  word-break: break-word;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Racetrack Reception</h1>
+
+<!-- button to create a new race session -->
+<!-- when clicked it calls the createSession() JavaScript function -->
+<button onclick="createSession()">Create Session</button> 
+
+<h2>Sessions</h2>
+
+
+<div id="sessions"></div> <!--all sessions will be rendered inside this container-->
+
+<script src="/socket.io/socket.io.js"></script> <!-- server connection-->
+
+<script>
+
+
+
+const socket = io(); //create real-time connection to the server
+
+const sessionsDiv = document.getElementById("sessions");//reference to the HTML container where sessions will be displayed
+
+socket.on("errorMessage", (message) => {
+  alert(message);
+});
+
+//function triggered when the "Create Session" button is pressed
+//it sends an event to the server requesting a new race session
+function createSession() {
+  console.log("Create Session clicked");
+  socket.emit("createSession");
+}
+
+function addDriver(sessionId) {
+
+  const name = prompt("Driver name (max 20 characters):"); //ask receptionist to enter drivers' names
+
+    if (!name) return;//if user cancels, stop the function
+
+    if (name.length > 20) {
+    alert("Driver name must be 20 characters or less");
+    return;
+    }
+
+  
+  socket.emit("addDriver", { //send event to server with session ID and driver names
+    sessionId,
+    driverName: name
+  });
+
+}
+
+function removeDriver(sessionId, driverName) {
+  socket.emit("removeDriver", {
+    sessionId,
+    driverName
+  });
+
+}
+
+function deleteSession(sessionId) {
+  socket.emit("deleteSession", sessionId);
+
+}
+
+//listen for updates from the server when session data changes
+//server sends the updated sessions list
+socket.on("sessionsUpdated", (sessions) => {
+  sessionsDiv.innerHTML = ""; //if update then clear the current session display
+  
+  sessions.forEach(session => {
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <h3>${session.id}</h3>
+
+      <ul>
+        ${session.drivers.map(d =>
+          `<li>
+            ${d.name} (Car ${d.carNumber})
+            <button onclick="removeDriver('${session.id}','${d.name}')">Remove</button>
+          </li>`
+        ).join("")}
+      </ul>
+
+        
+        ${session.drivers.length < 8  //1.2 limit the count of drivers to 8
+        ? `<button onclick="addDriver('${session.id}')">Add Driver</button>`
+        : `<button disabled>Session Full</button>`
+        }  
+
+        <button onclick="deleteSession('${session.id}')">Delete Session</button>
+
+      <hr>
+    `;
+
+    sessionsDiv.appendChild(div);  //1.2 add the completed session element to the page
+
+  });
+
+});
+
+</script>
+
+</body>
+</html>

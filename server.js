@@ -31,6 +31,7 @@ server.listen(3000, () => {
 });
 
 
+let sessionCounter = 1 //1.2 start session counting from 1 so we ensure every session has a unique ID
 // 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
   sessions: [],
@@ -80,14 +81,20 @@ socket.on("verifyKey", ({role, key}) => {
 });
 
 //1.2.3 all poolikud evendid. conditionale veel juurde vaja.
-socket.on("createSession", () => {   //1.2.3
-  const id = "session-" + (state.sessions.length + 1);
+socket.on("createSession", () => {   //1.2 session ID creation (unique IDs)
+console.log("createSession event received");
+  const session = {
+    id: "session-" + sessionCounter,
+    drivers: []
+  
+  };
 
-  const session = {id, drivers: []};
+  sessionCounter++;
 
   state.sessions.push(session);
 
   io.emit("sessionsUpdated", state.sessions);
+
 });
 
 socket.on("deleteSession", (sessionId) => {   //1.2.3
@@ -98,20 +105,51 @@ socket.on("deleteSession", (sessionId) => {   //1.2.3
 
 });
 
-socket.on("addDriver", ({sessionId, driverName}) => { // 1.2.3
+
+//1.2 addDriver (max 8 drivers per session)
+socket.on("addDriver", ({sessionId, driverName}) => {
+
+  driverName = driverName.trim();
+  if (driverName.length > 20) { //!!!!! 1.2 Hardcoded a limit
+  socket.emit("errorMessage", "Driver name must be 20 characters or less");
+  return;
+}
 
   const session = state.sessions.find(s => s.id === sessionId);
-  const carNumber = session.drivers.length + 1;
-  
-  session.drivers.push({name: driverName, carNumber});
+
+  if (!session) return;
+
+  // max 8 drivers
+  if (session.drivers.length >= 8) {
+    socket.emit("errorMessage", "Maximum 8 drivers allowed in a session");
+    return;
+  }
+
+  // prevent duplicate driver names
+  const nameExists = session.drivers.some(d => d.name === driverName);
+
+  if (nameExists) {
+    socket.emit("errorMessage", "Driver name already exists in this session");
+    return;
+  }
+
+  // find free car number
+  const carNumber = getAvailableCarNumber(session.drivers);
+  if (!carNumber) return;
+
+  session.drivers.push({
+    name: driverName,
+    carNumber
+  });
 
   io.emit("sessionsUpdated", state.sessions);
-
 });
+
 
 socket.on("removeDriver", ({sessionId, driverName}) => { //1.2.3
   
   const session = state.sessions.find(s => s.id === sessionId);
+  if (!session) return; //prevents server crashes if a bad request comes in
 
   session.drivers = session.drivers.filter(d => d.name !== driverName);
 
@@ -139,20 +177,30 @@ socket.on("setFlag", (mode) => { //1.2.3
   io.emit("flagChanged", mode);
 });
 
-socket.on("recordLap", (carNumber) => { //1.2.3
+
+socket.on("recordLap", (carNumber) => {//1.2.3
 
   const now = Date.now();
-  const lapData = state.laps[carNumber];
 
-  const lapTime = now - lapData.lastlap
+  if (!state.laps[carNumber]) {
+    state.laps[carNumber] = {
+      lap: 0,
+      fastest: null,
+      lastLap: now
+    };
+    return;
+  }
+
+  const lapData = state.laps[carNumber];
+  const lapTime = now - lapData.lastLap;
   lapData.lap++;
 
-  if (!lapData.fastest || lapTime < lapData.fastest)
-  {lapData.fastest = lapTime;}
+  if (!lapData.fastest || lapTime < lapData.fastest) {
+    lapData.fastest = lapTime;
+  }
 
   lapData.lastLap = now;
-
-  io.emit("leaderBoardUpdated", state.laps);
+  io.emit("leaderboardUpdated", state.laps);
 
 });
 
@@ -176,6 +224,21 @@ socket.on("endSession", () => {  //1.2.3
 
 // 1.2.3 functionid s.t. timer jne peavad olema io.on(connection)-st eraldi
 // 1.2.3 veel pole jõudnud functione teha
+
+
+// 1.2 check for car numbers (must be consecutive even when some drivers are deleted)
+function getAvailableCarNumber(drivers) {
+
+  for (let i = 1; i <= 8; i++) { //there can be 8 drivers
+    const taken = drivers.some(d => d.carNumber === i);
+    if (!taken) {
+      return i;
+    }
+  }
+  return null;
+}
+
+
 function startTimer() {
 
 }
