@@ -3,14 +3,64 @@
 
 <head>
     <title>Lap Line Tracker</title>
+    <style>
+        /* Space / breathing room for buttons */
+        #lap-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            /* wrap buttons to next row */
+            gap: 10px;
+            /* space between buttons */
+        }
+
+        /* Make buttons bigger and easier to press */
+        #lap-buttons button {
+            padding: 20px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+
+        /* Message area spacing */
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+
 </head>
 
 <body>
     <h1>Lap Line Tracker</h1>
-    <p>Lap tracking buttons will appear here.</p>
+
+    <!-- Message area -->
+    <div id="message">Press a car button when it crosses the line.</div>
+
+    <!-- Lap buttons -->
     <div id="lap-buttons">
-        <!-- TODO: Lap buttons will be added here -->
+        <!-- Buttons will be added here -->
     </div>
+
+    <script>
+        // Generate buttons for CAR 1 → CAR 8
+        const lapButtonsDiv = document.getElementById("lap-buttons");
+
+        for (let i = 1; i <= 8; i++) {
+            const btn = document.createElement("button");
+            btn.innerText = "CAR " + i;
+
+            // When pressed, show a message
+            btn.onclick = () => {
+                document.getElementById("message").innerText = `Lap recorded for CAR ${i}`;
+                // TODO: later we will send this to the server:
+                // socket.emit("recordLap", { carNumber: i });
+            };
+
+            lapButtonsDiv.appendChild(btn);
+        }
+    </script>
 
 </body>
 
