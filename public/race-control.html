@@ -1,12 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Race Control</title>
 </head>
 <body>
+    <h1>Race Control Page</h1>
 
-<h1>Race Control Page</h1>
-<p>This page will allow the Safety Official to control the race.</p>
+    <section>
+        <h2>Current session</h2>
+        <p id="current-session">No session selected.</p>
+    </section>
 
+    <section>
+        <h2>Current Race Mode</h2>
+        <p id="current-mode">Danger</p>
+    </section>
+
+    <section>
+        <h2>Controls</h2>
+        <div>
+        <button id="start-race">Start Race</button>
+        <button id="safe-mode">Safe Mode</button>
+        <button id="danger-mode">Danger</button>
+        <button id="hazard-mode">Hazard</button>
+        <button id="finish-mode">Finish</button>
+        <button id="end-session">End Session</button>
+        </div>
+    </section>
+    
 </body>
 </html>
