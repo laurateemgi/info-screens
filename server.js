@@ -240,13 +240,37 @@ function getAvailableCarNumber(drivers) {
 
 
 function startTimer() {
+  const raceLength =      //7.1
+    process.env.NODE_ENV === "dev"
+      ? 60 : 600;
 
+    state.timer = raceLength;
+
+    timerInterval = setInterval(() => {
+      state.timer--;
+
+      io.emit("timerUpdated", state.timer);
+      if (state.timer <= 0)
+      {finishRace();}
+    }, 1000);
 }
 
 function finishRace() {
+  clearInterval(timerInterval); //8.1
+  state.raceMode = "FINISH";
+  state.raceEnded = true;
 
+  io.emit("raceFinished", state);
 }
 
 function setupLapTracking() {
-
+  state.laps = {};  //8.1
+  state.currentSession.drivers.forEach(driver => {
+    state.laps[driver.carNumber] = {
+      driverName: driver.name,
+      lap: 0,
+      fastest: null,
+      lastLap: null
+    };
+  });
 }
