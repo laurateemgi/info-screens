@@ -40,11 +40,14 @@ h2 {
 
 /* driver rows */
 
+
 .driver-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  list-style: none;
+/*  margin-bottom: 6px; 
+  padding: 2px 0;*/
 }
 
 
@@ -71,20 +74,41 @@ button {
   padding: 8px 12px;
   border-radius: 6px;
   border: none;
-  background-color: #1976d2;
+  background-color: #5daeff;
   color: white;
   cursor: pointer;
   font-size: 14px;
 }
 
 button:hover {
-  background-color: #145ea8;
+  background-color: #95caff;
 }
 
 button:disabled {
   background-color: #aaa;
   cursor: not-allowed;
 }
+
+.remove-btn {
+  background: transparent ;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.remove-btn:hover {
+  color: #d9534f;
+  opacity: 1;
+}
+
+
+ul {
+  padding: 0;
+  margin: 10px 0;
+}
+
 
 </style>
 
@@ -182,8 +206,10 @@ socket.on("sessionsUpdated", (sessions) => {
         ${session.drivers.map(d =>
         `<li class="driver-row">
             <span>${d.name} (Car ${d.carNumber})</span>
-            <button onclick="removeDriver('${session.id}','${d.name}')">Remove</button>
-        </li>`
+            <button class="remove-btn" onclick="removeDriver('${session.id}','${d.name}')">
+            ×
+            </button>
+            </li>`
         ).join("")}
     </ul>
 
