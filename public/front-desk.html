@@ -8,6 +8,87 @@ li {
   word-break: break-word;
 }
 </style>
+
+<!-- 2.2 adding styling-->
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin-top: 30px;
+}
+
+/* session cards */
+
+.session-card {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* driver rows */
+
+.driver-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+
+/* driver input section */
+
+.driver-form {
+  margin-top: 15px;
+  display: flex;
+  gap: 8px;
+}
+
+/* input field */
+
+input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  flex-grow: 1;
+}
+
+/* buttons */
+
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #145ea8;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+</style>
+
+
 </head>
 
 <body>
@@ -44,24 +125,28 @@ function createSession() {
   socket.emit("createSession");
 }
 
+
 function addDriver(sessionId) {
+  const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
+  const name = input.value.trim();
 
-  const name = prompt("Driver name (max 20 characters):"); //ask receptionist to enter drivers' names
+  if (!name) return;
 
-    if (!name) return;//if user cancels, stop the function
-
-    if (name.length > 20) {
+  if (name.length > 20) {
     alert("Driver name must be 20 characters or less");
     return;
-    }
+  }
 
-  
   socket.emit("addDriver", { //send event to server with session ID and driver names
     sessionId,
     driverName: name
   });
 
+  input.value = "";
 }
+
+
+
 
 function removeDriver(sessionId, driverName) {
   socket.emit("removeDriver", {
@@ -83,29 +168,39 @@ socket.on("sessionsUpdated", (sessions) => {
   
   sessions.forEach(session => {
     const div = document.createElement("div");
+    div.className = "session-card";
 
     div.innerHTML = `
-      <h3>${session.id}</h3>
+    <h3>${session.id}</h3>
 
-      <ul>
+   <ul>
         ${session.drivers.map(d =>
-          `<li>
-            ${d.name} (Car ${d.carNumber})
+        `<li class="driver-row">
+            <span>${d.name} (Car ${d.carNumber})</span>
             <button onclick="removeDriver('${session.id}','${d.name}')">Remove</button>
-          </li>`
+        </li>`
         ).join("")}
-      </ul>
+    </ul>
 
-        
-        ${session.drivers.length < 8  //1.2 limit the count of drivers to 8
-        ? `<button onclick="addDriver('${session.id}')">Add Driver</button>`
+
+    <div class="driver-form">
+        ${session.drivers.length < 8
+        ? `
+            <input
+            id="driver-input-${session.id}"
+            type="text"
+            placeholder="Enter driver name"
+            maxlength="20"
+            >
+            <button onclick="addDriver('${session.id}')">Add Driver</button>
+        `
         : `<button disabled>Session Full</button>`
-        }  
+        }
 
         <button onclick="deleteSession('${session.id}')">Delete Session</button>
-
-      <hr>
+    </div>
     `;
+
 
     sessionsDiv.appendChild(div);  //1.2 add the completed session element to the page
 
