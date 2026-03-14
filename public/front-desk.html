@@ -113,6 +113,7 @@ button:disabled {
 const socket = io(); //create real-time connection to the server
 
 const sessionsDiv = document.getElementById("sessions");//reference to the HTML container where sessions will be displayed
+let lastActiveSessionInput = null; //to get focus on the last field that was used before sedning the message to server
 
 socket.on("errorMessage", (message) => {
   alert(message);
@@ -136,6 +137,8 @@ function addDriver(sessionId) {
     alert("Driver name must be 20 characters or less");
     return;
   }
+  
+  lastActiveSessionInput = sessionId; //restore focus after rendering
 
   socket.emit("addDriver", { //send event to server with session ID and driver names
     sessionId,
@@ -143,6 +146,8 @@ function addDriver(sessionId) {
   });
 
   input.value = "";
+  input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
+
 }
 
 
@@ -191,7 +196,9 @@ socket.on("sessionsUpdated", (sessions) => {
             type="text"
             placeholder="Enter driver name"
             maxlength="20"
+            onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
             >
+
             <button onclick="addDriver('${session.id}')">Add Driver</button>
         `
         : `<button disabled>Session Full</button>`
@@ -204,9 +211,17 @@ socket.on("sessionsUpdated", (sessions) => {
 
     sessionsDiv.appendChild(div);  //1.2 add the completed session element to the page
 
+    });
+
+        if (lastActiveSessionInput) { //restore focus after rendering
+        const input = document.getElementById(`driver-input-${lastActiveSessionInput}`);
+        if (input) {
+            input.focus();
+        }
+        }
+
   });
 
-});
 
 </script>
 
