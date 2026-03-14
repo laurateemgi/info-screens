@@ -3,6 +3,47 @@
 
 <head>
     <title>Next Race</title>
+    <style>
+        /* Page styling to match front-desk.html */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        /* Card container for consistency */
+        .next-race-card {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+
+        th,
+        td {
+            border: 1px solid #000000;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        th {
+            background-color: #eee;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -11,9 +52,24 @@
 
     <p>Upcoming drivers will appear here.</p>
 
-    <div id="drivers">
-        <!-- TODO: Driver list will appear here -->
-    </div>
+    <!-- Card container for next race table -->
+    <div class="next-race-card">
+        <table>
+            <tr>
+                <!-- Table headers -->
+                <th>Driver</th>
+                <th>Car Number</th>
+            </tr>
+
+            <!-- Placeholder row -->
+            <tr>
+                <td colspan="2">Next race drivers will appear here</td>
+            </tr>
+        </table>
+
+        <div id="drivers">
+            <!-- TODO: Driver list will appear here for Socket.IO -->
+        </div>
 
 </body>
 
