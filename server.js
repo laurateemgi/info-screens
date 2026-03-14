@@ -31,7 +31,7 @@ server.listen(3000, () => {
 });
 
 
-let sessionCounter = 1 //1.2 start session counting from 1 so we ensure every session has a unique ID
+
 // 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
   sessions: [],
@@ -44,7 +44,14 @@ const state = {
   laps: {},
   lastFinishedSession: null
 };
+
+function broadcastState() { //3.1 broadcastState, aga veel ei kasuta seda kuskil (io.emit hoopis kasutusel. vb peab ümber tegema)
+  io.emit("stateUpdated", state);
+}
+
 // 1.1 npm start ja npn run dev on package.jsonis olemas, aga need sõltuvad actual timer funktsioonist
+let sessionCounter = 1 //1.2 start session counting from 1 so we ensure every session has a unique ID
+let timerInterval = null; // 7.1 et timer jooksma ei jääks
 
 // 1.1 socket.io ühendus
 io.on("connection", (socket) => {
@@ -159,6 +166,7 @@ socket.on("removeDriver", ({sessionId, driverName}) => { //1.2.3
 socket.on("startRace", () => { //1.2.3
 
   state.currentSession = state.sessions.shift();
+    if (!state.sessions.length) return; //4.1 if cond for if no sessions exist
   state.nextSession = state.sessions[0] || null;
   state.raceStarted = true;
   state.raceEnded = false;
@@ -172,6 +180,7 @@ socket.on("startRace", () => { //1.2.3
 
 socket.on("setFlag", (mode) => { //1.2.3
 
+  if(state.raceMode === "FINISH") return; //4.1 race läbi,siis flag vahetust ei toimu
   state.raceMode = mode;
 
   io.emit("flagChanged", mode);
@@ -256,7 +265,8 @@ function startTimer() {
 }
 
 function finishRace() {
-  clearInterval(timerInterval); //8.1
+  if (state.raceEnded) return; //8.1
+  clearInterval(timerInterval); 
   state.raceMode = "FINISH";
   state.raceEnded = true;
 
