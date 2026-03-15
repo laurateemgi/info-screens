@@ -28,6 +28,13 @@
             margin-top: 15px;
             font-weight: bold;
         }
+
+        #lap-buttons button:disabled {
+            background-color: rgb(255, 41, 41);
+            /* when background color changes, the text stays visible */
+            color: white;
+            cursor: not-allowed;
+        }
     </style>
 
 </head>
@@ -43,7 +50,20 @@
         <!-- Buttons will be added here -->
     </div>
 
+    <!-- This will make this file talk to the server using Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+
     <script>
+
+        // const socket = io(); → This opens a connection to the backend.
+        // socket.on("connect", ...) → Confirms the connection and is useful for testing.
+
+        const socket = io();
+
+        socket.on("connect", () => {
+            console.log("Connected to server");
+        });
+
         // Generate buttons for CAR 1 → CAR 8
         const lapButtonsDiv = document.getElementById("lap-buttons");
 
@@ -53,9 +73,18 @@
 
             // When pressed, show a message
             btn.onclick = () => {
+                // Show a message
                 document.getElementById("message").innerText = `Lap recorded for CAR ${i}`;
-                // TODO: later we will send this to the server:
-                // socket.emit("recordLap", { carNumber: i });
+
+                // Send lap to server
+                socket.emit("recordLap", i);
+                console.log("Lap sent for CAR", i);
+
+                // Disable the button for 1 second to prevent double press
+                btn.disabled = true;  // button is temporarily disabled
+                setTimeout(() => {
+                    btn.disabled = false; // re-enable after 1 second
+                }, 1000);
             };
 
             lapButtonsDiv.appendChild(btn);
