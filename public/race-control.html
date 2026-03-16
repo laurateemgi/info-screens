@@ -18,8 +18,11 @@
         <p id="current-mode">Danger</p>
     </section>
 
+    <!-- Control buttons used by the Safety Official -->
     <section>
         <h2>Controls</h2>
+
+        <!-- Control buttons used by the Safety Official -->
         <div>
         <button id="start-race">Start Race</button>
         <button id="safe-mode">Safe</button>
@@ -29,6 +32,51 @@
         <button id="end-session">End Session</button>
         </div>
     </section>
-    
+
+    <!-- Load the Socket.IO client library from the server -->
+<script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Connect to the Socket.IO server
+        const socket = io();
+
+        // Connect to the Socket.IO server
+        const startBtn = document.getElementById("start-race");
+        const safeBtn = document.getElementById("safe-mode");
+        const hazardBtn = document.getElementById("hazard-mode");
+        const dangerBtn = document.getElementById("danger-mode");
+        const finishBtn = document.getElementById("finish-mode");
+        const endSessionBtn = document.getElementById("end-session");
+
+        // When Start Race is clicked, notify the server to start the race
+        startBtn.addEventListener("click", () => {
+            socket.emit("startRace");
+        });
+
+        // Change race flag to SAFE
+        safeBtn.addEventListener("click", () => {
+            socket.emit("setFlag", "safe");
+        });
+
+        // Change race flag to SAFE
+        hazardBtn.addEventListener("click", () => {
+            socket.emit("setFlag", "hazard");
+        });
+
+        // Change race flag to DANGER
+        dangerBtn.addEventListener("click", () => {
+            socket.emit("setFlag", "danger");
+        });
+
+        // Notify server that race has finished
+        finishBtn.addEventListener("click", () => {
+            socket.emit("finishRace");
+        });
+
+        // Notify server that session should end
+        endSessionBtn.addEventListener("click", () => {
+            socket.emit("endSession");
+        });
+    </script>
+
 </body>
 </html>
