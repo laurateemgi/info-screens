@@ -1,12 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Race Flags</title>
-</head>
-<body>
 
-<h1>Race Flags Display</h1>
-<p>This screen will display the current race flag.</p>
+<style>
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* SAFE */
+.safe {
+    background-color: green;
+}
+
+/* HAZARD */
+.hazard {
+    background-color: yellow;
+    color: black;
+}
+
+/* DANGER */
+.danger {
+    background-color: red;
+}
+
+/* FINISH */
+.finish {
+    background-image: repeating-conic-gradient(
+        black 0% 25%,
+        white 0% 50%
+    );
+    background-size: 100px 100px;
+}
+</style>
+</head>
+
+<body class="safe">
+
+<h1>SAFE</h1>
 
 </body>
 </html>
