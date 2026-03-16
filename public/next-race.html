@@ -4,7 +4,7 @@
 <head>
     <title>Next Race</title>
     <style>
-        /* Page styling to match front-desk.html */
+        /* Page styling */
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
@@ -50,26 +50,80 @@
 
     <h1>Next Race</h1>
 
-    <p>Upcoming drivers will appear here.</p>
-
     <!-- Card container for next race table -->
     <div class="next-race-card">
         <table>
-            <tr>
-                <!-- Table headers -->
-                <th>Driver</th>
-                <th>Car Number</th>
-            </tr>
+            <thead>
+                <tr>
+                    <!-- Table headers -->
+                    <th>Driver</th>
+                    <th>Car Number</th>
+                </tr>
+            </thead>
 
             <!-- Placeholder row -->
-            <tr>
-                <td colspan="2">Next race drivers will appear here</td>
-            </tr>
+            <tbody id="drivers-table">
+                <tr>
+                    <td colspan="2">Next race drivers will appear here</td>
+                </tr>
+            </tbody>
         </table>
 
-        <div id="drivers">
-            <!-- TODO: Driver list will appear here for Socket.IO -->
-        </div>
+        <!-- Socket.IO -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+
+            socket.on("connect", () => {
+                console.log("Next Race screen connected");
+            });
+
+
+            // Listen for session updates
+            socket.on("sessionsUpdated", (sessions) => {
+                const tbody = document.getElementById("drivers-table");
+                tbody.innerHTML = ""; // clear previous rows
+
+                if (!sessions || sessions.length === 0) {
+                    // No upcoming sessions
+                    const tr = document.createElement("tr");
+                    const td = document.createElement("td");
+                    td.colSpan = 2;
+                    td.innerText = "No upcoming races";
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                    return;
+                }
+
+                // Show the first session only (next session)
+                const nextSession = sessions[0];
+
+                if (!nextSession.drivers || nextSession.drivers.length === 0) {
+                    const tr = document.createElement("tr");
+                    const td = document.createElement("td");
+                    td.colSpan = 2;
+                    td.innerText = "No drivers in next session";
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                    return;
+                }
+
+                // Populate drivers
+                nextSession.drivers.forEach(driver => {
+                    const tr = document.createElement("tr");
+
+                    const tdName = document.createElement("td");
+                    tdName.innerText = driver.name;
+                    tr.appendChild(tdName);
+
+                    const tdCar = document.createElement("td");
+                    tdCar.innerText = driver.carNumber;
+                    tr.appendChild(tdCar);
+
+                    tbody.appendChild(tr);
+                });
+            });
+        </script>
 
 </body>
 
