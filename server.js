@@ -106,6 +106,8 @@ console.log("createSession event received");
 
 socket.on("deleteSession", (sessionId) => {   //1.2.3
 
+  if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada)
+
   state.sessions = state.sessions.filter(s => s.id !== sessionId);
   
   io.emit("sessionsUpdated", state.sessions);
@@ -116,6 +118,7 @@ socket.on("deleteSession", (sessionId) => {   //1.2.3
 //1.2 addDriver (max 8 drivers per session)
 socket.on("addDriver", ({sessionId, driverName}) => {
 
+  if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
   driverName = driverName.trim();
   if (driverName.length > 20) { //!!!!! 1.2 Hardcoded a limit
   socket.emit("errorMessage", "Driver name must be 20 characters or less");
@@ -155,6 +158,7 @@ socket.on("addDriver", ({sessionId, driverName}) => {
 
 socket.on("removeDriver", ({sessionId, driverName}) => { //1.2.3
   
+  if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada)
   const session = state.sessions.find(s => s.id === sessionId);
   if (!session) return; //prevents server crashes if a bad request comes in
 
@@ -164,9 +168,9 @@ socket.on("removeDriver", ({sessionId, driverName}) => { //1.2.3
 });
 
 socket.on("startRace", () => { //1.2.3
-
+  if (state.raceStarted) return; // 4.1 (16MAR) if cond add (ei saa mitut race'i korraga alustada)
+  if (!state.sessions.length) return; //4.1 if cond for if no sessions exist //tõstsin ümber
   state.currentSession = state.sessions.shift();
-    if (!state.sessions.length) return; //4.1 if cond for if no sessions exist
   state.nextSession = state.sessions[0] || null;
   state.raceStarted = true;
   state.raceEnded = false;
@@ -176,18 +180,25 @@ socket.on("startRace", () => { //1.2.3
   startTimer();
 
   io.emit("raceStarted", state);
+  io.emit("flagChanged", state.raceMode);
+  io.emit("sessionsUpdated", state.sessions);
+  io.emit("stateUpdated", state);
 });
 
 socket.on("setFlag", (mode) => { //1.2.3
 
-  if(state.raceMode === "FINISH") return; //4.1 race läbi,siis flag vahetust ei toimu
+  if (!state.raceStarted) return; // 4.1 (16MAR) if cond add (race ei käi, siis flag ei vahetu)
+  if (state.raceMode === "FINISH") return; //4.1 race läbi,siis flag vahetust ei toimu
   state.raceMode = mode;
 
   io.emit("flagChanged", mode);
+  io.emit("stateUpdated", state);
 });
 
 
 socket.on("recordLap", (carNumber) => {//1.2.3
+
+  if (!state.raceStarted || state.raceEnded) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
 
   const now = Date.now();
 
@@ -217,6 +228,14 @@ socket.on("finishRace", () => {finishRace()}); //1.2.3
 
 socket.on("endSession", () => {  //1.2.3
 
+  if (state.currentSession) { // 4.1 (16 MAR) if cond add (kui race algas)
+    state.lastFinishedSession = state.currentSession;
+    state.currentSession = null;
+  }
+  else if (state.sessions.length) { // 4.1 (16MAR) if cond add (kui session algas, aga race'i ei alustatud ja tahetakse session lõpetada. tehniline error vms)
+    state.lastFinishedSession = state.sessions.shift();
+  }
+
   state.lastFinishedSession = state.currentSession;
   state.currentSession = null;
   state.raceStarted = false;
@@ -226,6 +245,8 @@ socket.on("endSession", () => {  //1.2.3
   state.laps = {};
 
   io.emit("stateUpdated", state);
+  io.emit("flagChanged", state.raceMode);
+  io.emit("sessionsUpdated", state.sessions);
 });
 
 // Race Control events from the Safety Official interface
@@ -363,7 +384,8 @@ function startTimer() {
 
 function finishRace() {
   if (state.raceEnded) return; //8.1
-  clearInterval(timerInterval); 
+  clearInterval(timerInterval);
+  timerInterval = null; //4.1 (16MAR) resetib timerintervali
   state.raceMode = "FINISH";
   state.raceEnded = true;
 
