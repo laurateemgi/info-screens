@@ -121,10 +121,11 @@ ul {
 
 <!-- button to create a new race session -->
 <!-- when clicked it calls the createSession() JavaScript function -->
-<button onclick="createSession()">Create Session</button> 
+<button onclick="createSession()">+ New Session</button>
 
 <h2>Sessions</h2>
 
+<div id="error-message" style="color: red; margin-bottom: 10px;"></div>
 
 <div id="sessions"></div> <!--all sessions will be rendered inside this container-->
 
@@ -139,15 +140,30 @@ const socket = io(); //create real-time connection to the server
 const sessionsDiv = document.getElementById("sessions");//reference to the HTML container where sessions will be displayed
 let lastActiveSessionInput = null; //to get focus on the last field that was used before sedning the message to server
 
+const errorDiv = document.getElementById("error-message"); //show error messages in error div
+
+function showError(message) {
+  errorDiv.textContent = message;
+
+  setTimeout(() => {
+    errorDiv.textContent = "";
+  }, 3000);
+}
+
 socket.on("errorMessage", (message) => {
-  alert(message);
+  showError(message);
 });
+
+
 
 //function triggered when the "Create Session" button is pressed
 //it sends an event to the server requesting a new race session
 function createSession() {
-  console.log("Create Session clicked");
-  socket.emit("createSession");
+    if (!confirm("Create a new empty session?")) {
+        return;
+    }
+
+    socket.emit("createSession");
 }
 
 
@@ -155,12 +171,15 @@ function addDriver(sessionId) {
   const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
   const name = input.value.trim();
 
-  if (!name) return;
-
-  if (name.length > 20) {
-    alert("Driver name must be 20 characters or less");
+    if (!name) {
+    showError("Driver name cannot be empty");
     return;
-  }
+    }
+
+    if (name.length > 20) {
+    showError("Driver name must be 20 characters or less");
+    return;
+    }
   
   lastActiveSessionInput = sessionId; //restore focus after rendering
 
@@ -200,7 +219,7 @@ socket.on("sessionsUpdated", (sessions) => {
     div.className = "session-card";
 
     div.innerHTML = `
-    <h3>${session.id}</h3>
+    <h3>${session.id}</h3> 
 
    <ul>
         ${session.drivers.map(d =>
