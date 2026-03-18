@@ -40,11 +40,12 @@ h2 {
 
 /* driver rows */
 
-
 .driver-row {
+  display: span;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  justify-content: space-between;
   list-style: none;
 /*  margin-bottom: 6px; 
   padding: 2px 0;*/
@@ -58,6 +59,25 @@ h2 {
   display: flex;
   gap: 8px;
 }
+
+/* driver car label */
+
+.driver-label {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* controls spacing cleanly */
+}
+
+.car-badge {
+  background: #2c7be5;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  min-width: 15px;
+  text-align: center;
+}
+
 
 /* input field */
 
@@ -222,13 +242,18 @@ socket.on("sessionsUpdated", (sessions) => {
     <h3>${session.id}</h3> 
 
    <ul>
-        ${session.drivers.map(d =>
+
+    ${session.drivers.map(d =>
         `<li class="driver-row">
-            <span>${d.name} (Car ${d.carNumber})</span>
+            <span class="driver-label">
+            <span class="car-badge">${d.carNumber}</span>
+            <span class="driver-name">${d.name}</span>
+            </span>
+
             <button class="remove-btn" onclick="removeDriver('${session.id}','${d.name}')">
-            ×
+                ×
             </button>
-            </li>`
+        </li>`
         ).join("")}
     </ul>
 
