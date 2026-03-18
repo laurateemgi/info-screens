@@ -118,7 +118,7 @@ socket.on("deleteSession", (sessionId) => {   //1.2.3
 //1.2 addDriver (max 8 drivers per session)
 socket.on("addDriver", ({sessionId, driverName}) => {
 
-  if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
+  //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
   driverName = driverName.trim();
   if (driverName.length > 20) { //!!!!! 1.2 Hardcoded a limit
   socket.emit("errorMessage", "Driver name must be 20 characters or less");
