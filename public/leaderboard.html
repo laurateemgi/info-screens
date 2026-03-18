@@ -65,20 +65,90 @@
 
     <h1>Race Leaderboard</h1>
 
+    <div class="leaderboard-card">
 
-    <table>
-        <tr>
-            <th>Position</th>
-            <th>Driver</th>
-            <th>Car</th>
-            <th>Laps</th>
-            <th>Fastest Lap</th>
-        </tr>
+        <table>
+            <thead> <!-- for cleaner structure -->
+                <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Car</th>
+                    <th>Laps</th>
+                    <th>Fastest Lap</th>
+                </tr>
+            </thead>
 
-        <tr>
-            <td colspan="5">No race data yet</td>
-        </tr>
-    </table>
+            <!-- Added tbody with ID so JS can update it -->
+            <tbody id="leaderboard-body">
+
+                <tr>
+                    <td colspan="5">No race data yet</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Socket.IO script -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        // Connect to server
+        const socket = io();
+
+        socket.on("connect", () => {
+            console.log("Leaderboard connected");
+        });
+
+        // Listen for leaderboard updates from server
+        socket.on("leaderboardUpdated", (laps) => {
+            renderLeaderboard(laps);
+        });
+
+        // Function to render table rows
+        function renderLeaderboard(laps) {
+
+            const tbody = document.getElementById("leaderboard-body");
+
+            // Clear old data
+            tbody.innerHTML = "";
+
+            // Convert object → array so we can loop & sort
+            let cars = Object.entries(laps);
+
+            // Sort by fastest lap (smallest time first)
+            cars.sort((a, b) => {
+                const aFast = a[1].fastest || Infinity;
+                const bFast = b[1].fastest || Infinity;
+                return aFast - bFast;
+            });
+
+            // Loop through cars
+            cars.forEach(([carNumber, data], index) => {
+
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${index + 1}</td> <!-- position -->
+                    <td>${data.driverName || "-"}</td>
+                    <td>${carNumber}</td>
+                    <td>${data.lap}</td>
+                    <td>${data.fastest ? data.fastest : "-"}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+            // Fallback if no data
+            if (cars.length === 0) {
+                const tr = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = 5;
+                td.innerText = "No race data yet";
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            }
+        }
+    </script>
 
 </body>
 
