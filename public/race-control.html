@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Race Control</title>
+    <title>Race Control</title>
 </head>
+
 <body>
     <h1>Race Control Page</h1>
 
     <section>
         <h2>Current session</h2>
         <p id="current-session">No session selected.</p>
+    </section>
+
+    <section>
+        <h2>Race status</h2>
+        <p id="race-status">Race not started</p>
     </section>
 
     <section>
@@ -24,17 +31,17 @@
 
         <!-- Control buttons used by the Safety Official -->
         <div>
-        <button id="start-race">Start Race</button>
-        <button id="safe-mode">Safe</button>
-        <button id="hazard-mode">Hazard</button>
-        <button id="danger-mode">Danger</button>
-        <button id="finish-mode">Finish</button>
-        <button id="end-session">End Session</button>
+            <button id="start-race">Start Race</button>
+            <button id="safe-mode">Safe</button>
+            <button id="hazard-mode">Hazard</button>
+            <button id="danger-mode">Danger</button>
+            <button id="finish-mode">Finish</button>
+            <button id="end-session">End Session</button>
         </div>
     </section>
 
     <!-- Load the Socket.IO client library from the server -->
-<script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         // Connect to the Socket.IO server
         const socket = io();
@@ -47,6 +54,11 @@
         const finishBtn = document.getElementById("finish-mode");
         const endSessionBtn = document.getElementById("end-session");
 
+        // Text elements
+        const currentSessionEl = document.getElementById("current-session");
+        const raceStatusEl = document.getElementById("race-status");
+        const currentModeEl = document.getElementById("current-mode");
+
         // When Start Race is clicked, notify the server to start the race
         startBtn.addEventListener("click", () => {
             socket.emit("startRace");
@@ -54,17 +66,17 @@
 
         // Change race flag to SAFE
         safeBtn.addEventListener("click", () => {
-            socket.emit("setFlag", "safe");
+            socket.emit("setFlag", "SAFE");
         });
 
         // Change race flag to SAFE
         hazardBtn.addEventListener("click", () => {
-            socket.emit("setFlag", "hazard");
+            socket.emit("setFlag", "HAZARD");
         });
 
         // Change race flag to DANGER
         dangerBtn.addEventListener("click", () => {
-            socket.emit("setFlag", "danger");
+            socket.emit("setFlag", "DANGER");
         });
 
         // Notify server that race has finished
@@ -76,7 +88,38 @@
         endSessionBtn.addEventListener("click", () => {
             socket.emit("endSession");
         });
-    </script>
 
+        // Listen for updated state from the server
+        socket.on("stateUpdated", (state) => {
+            // Show current session name if one exists
+            if (state.currentSession && state.currentSession.name) {
+                currentSessionEl.textContent = state.currentSession.name;
+            } else {
+                currentSessionEl.textContent = "No session selected.";
+            }
+
+            // Show race status
+            if (state.raceEnded) {
+                raceStatusEl.textContent = "Race finished";
+            } else if (state.raceStarted) {
+                raceStatusEl.textContent = "Race is running";
+            } else {
+                raceStatusEl.textContent = "Race not started";
+            }
+
+            // Show current race mode
+            currentModeEl.textContent = state.raceMode;
+
+            // Disable Start Race button if race already running
+            if (state.raceStarted) {
+                startBtn.disabled = true;
+            } else {
+                startBtn.disabled = false;
+            }
+        });
+
+
+    </script>
 </body>
+
 </html>
