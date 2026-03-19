@@ -1,53 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Race Flags</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Flags</title>
 
-<style>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
 
-body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 60px;
-    font-family: Arial, sans-serif;
-    color: white;
-}
+        /* SAFE */
+        .safe {
+            background-color: green;
+        }
 
-/* SAFE */
-.safe {
-    background-color: green;
-}
+        /* HAZARD */
+        .hazard {
+            background-color: yellow;
+            color: black;
+        }
 
-/* HAZARD */
-.hazard {
-    background-color: yellow;
-    color: black;
-}
+        /* DANGER */
+        .danger {
+            background-color: red;
+        }
 
-/* DANGER */
-.danger {
-    background-color: red;
-}
-
-/* FINISH */
-.finish {
-    background-image: repeating-conic-gradient(
-        black 0% 25%,
-        white 0% 50%
-    );
-    background-size: 100px 100px;
-}
-</style>
+        /* FINISH */
+        .finish {
+            background-image: repeating-conic-gradient(black 0% 25%,
+                    white 0% 50%);
+            background-size: 100px 100px;
+            color: black;
+            text-shadow: 1px 1px 0 white;
+        }
+    </style>
 </head>
+
 
 <body class="safe">
 
-<h1>SAFE</h1>
+    <h1 id="flag-text">SAFE</h1>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+
+        const body = document.body;
+        const flagText = document.getElementById("flag-text");
+
+        // Function to update screen
+        function updateFlag(mode) {
+            // eemalda vanad klassid
+            body.classList.remove("safe", "hazard", "danger", "finish");
+
+            const m = (mode || "DANGER").toUpperCase();
+
+            if (m === "SAFE") {
+                body.classList.add("safe");
+                flagText.textContent = "SAFE";
+            }
+            else if (m === "HAZARD") {
+                body.classList.add("hazard");
+                flagText.textContent = "HAZARD";
+            }
+            else if (m === "FINISH") {
+                body.classList.add("finish");
+                flagText.textContent = "FINISH";
+            }
+            else {
+                body.classList.add("danger");
+                flagText.textContent = "DANGER";
+            }
+        }
+
+        socket.on("stateUpdated", (state) => {
+            if (state && state.raceMode) {
+                updateFlag(state.raceMode);
+            }
+        });
+
+        socket.on("flagChanged", (mode) => {
+            updateFlag(mode);
+        });
+
+        socket.on("connect", () => {
+            console.log("Connected to server");
+        });
+    </script>
 
 </body>
+
 </html>
