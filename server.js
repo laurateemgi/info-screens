@@ -188,10 +188,13 @@ io.on("connection", (socket) => {
   socket.on("setFlag", (mode) => { //1.2.3
 
     if (!state.raceStarted) return; // 4.1 (16MAR) if cond add (race ei käi, siis flag ei vahetu)
-    if (state.raceMode === "FINISH") return; //4.1 race läbi,siis flag vahetust ei toimu
+    if (state.raceEnded) return; // Task 8.3:
+    // Kui race on lõpetatud (finishRace() käivitatud),
+    // siis lukustame race mode'i täielikult
+
     state.raceMode = mode;
 
-    io.emit("flagChanged", mode);
+    io.emit("flagChanged", state.raceMode); // Saada uuendus kõikidele ekraanidele
     io.emit("stateUpdated", state);
   });
 
@@ -228,6 +231,9 @@ io.on("connection", (socket) => {
 
   socket.on("endSession", () => {  //1.2.3
 
+    // End Session on lubatud ainult pärast FINISH'i
+    if (!state.raceEnded) return;
+
     if (state.currentSession) { // 4.1 (16 MAR) if cond add (kui race algas)
       state.lastFinishedSession = state.currentSession;
       state.currentSession = null;
@@ -236,14 +242,14 @@ io.on("connection", (socket) => {
       state.lastFinishedSession = state.sessions.shift();
     }
 
-    state.lastFinishedSession = state.currentSession;
-    state.currentSession = null;
+    state.nextSession = state.sessions[0] || null;
     state.raceStarted = false;
     state.raceEnded = false;
     state.raceMode = "DANGER";
     state.timer = 0;
     state.laps = {};
 
+    io.emit("sessionEnded", state);
     io.emit("stateUpdated", state);
     io.emit("flagChanged", state.raceMode);
     io.emit("sessionsUpdated", state.sessions);

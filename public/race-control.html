@@ -59,6 +59,42 @@
         const raceStatusEl = document.getElementById("race-status");
         const currentModeEl = document.getElementById("current-mode");
 
+
+        function renderControls(state) {
+            if (!state.raceStarted && !state.raceEnded) {
+                startBtn.style.display = "inline-block";
+                safeBtn.style.display = "none";
+                hazardBtn.style.display = "none";
+                dangerBtn.style.display = "none";
+                finishBtn.style.display = "none";
+                endSessionBtn.style.display = "none";
+                return;
+            }
+
+            if (state.raceEnded) {
+                startBtn.style.display = "none";
+                safeBtn.style.display = "none";
+                hazardBtn.style.display = "none";
+                dangerBtn.style.display = "none";
+                finishBtn.style.display = "none";
+                endSessionBtn.style.display = "inline-block";
+                return;
+            }
+
+            startBtn.style.display = "none";
+            safeBtn.style.display = "inline-block";
+            hazardBtn.style.display = "inline-block";
+            dangerBtn.style.display = "inline-block";
+            finishBtn.style.display = "inline-block";
+            endSessionBtn.style.display = "none";
+        }
+
+        // Algolek enne esimest stateUpdated eventi
+        renderControls({
+            raceStarted: false,
+            raceEnded: false
+        });
+
         // When Start Race is clicked, notify the server to start the race
         startBtn.addEventListener("click", () => {
             socket.emit("startRace");
@@ -109,13 +145,7 @@
 
             // Show current race mode
             currentModeEl.textContent = state.raceMode;
-
-            // Disable Start Race button if race already running
-            if (state.raceStarted) {
-                startBtn.disabled = true;
-            } else {
-                startBtn.disabled = false;
-            }
+            renderControls(state);
         });
 
 
