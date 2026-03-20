@@ -130,6 +130,10 @@
             // Show current session name if one exists
             if (state.currentSession && state.currentSession.name) {
                 currentSessionEl.textContent = state.currentSession.name;
+            } else if (state.nextSession && state.nextSession.name) {
+                currentSessionEl.textContent = state.nextSession.name;
+            } else if (state.sessions && state.sessions.length > 0) {
+                currentSessionEl.textContent = state.sessions[0].name;
             } else {
                 currentSessionEl.textContent = "No session selected.";
             }
@@ -146,6 +150,14 @@
             // Show current race mode
             currentModeEl.textContent = state.raceMode;
             renderControls(state);
+        });
+
+        socket.on("sessionsUpdated", (sessions) => {
+            if (sessions && sessions.length > 0) {
+                currentSessionEl.textContent = sessions[0].name;
+            } else {
+                currentSessionEl.textContent = "No session selected.";
+            }
         });
 
 
