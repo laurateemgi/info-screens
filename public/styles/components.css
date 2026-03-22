@@ -1,0 +1,287 @@
+/* ==============================
+   BUTTON SYSTEM
+============================== */
+.btn {
+    font-family: 'Orbitron', sans-serif;
+    margin: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 32px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background: #fff;
+    color: #222;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+/* broken border */
+.btn::before,
+.btn::after {
+    content: "";
+    position: absolute;
+    border: 2px solid #000;
+    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+}
+
+.btn::before {
+    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
+}
+
+.btn::after {
+    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+}
+
+.btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.btn:disabled {
+    background: linear-gradient(145deg, #777, #555);
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+/* primary */
+.btn-primary {
+    background: #fff;
+    color: #000;
+}
+
+/* remove button */
+.remove-btn {
+    background: #e31b23;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* ==============================
+   LAP BUTTONS
+============================== */
+#lap-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 buttons per row */
+    gap: 16px;
+    /* spacing between buttons */
+    margin-top: 20px;
+}
+
+#lap-buttons button {
+    padding: 24px 0;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    background: #f9f9f9;
+    color: #222;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* broken border effect */
+#lap-buttons button::before,
+#lap-buttons button::after {
+    content: "";
+    position: absolute;
+    border: 2px solid #000;
+    border-radius: 12px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    box-sizing: border-box;
+    opacity: 0.5;
+}
+
+#lap-buttons button::before {
+    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
+}
+
+#lap-buttons button::after {
+    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+}
+
+/* Active / pressed / disabled states */
+#lap-buttons button.active,
+#lap-buttons button:disabled {
+    border-color: #000;
+    background: #fff;
+    color: #222;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -1px 2px rgba(255, 255, 255, 0.3);
+}
+
+#lap-buttons button:disabled {
+    background: linear-gradient(145deg, #777, #555);
+    color: #ccc;
+    cursor: not-allowed;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    opacity: 0.8;
+}
+
+/* ==============================
+   LISTS
+============================== */
+.list {
+    list-style: none;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    background: #333;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+/* ==============================
+   FORMS
+============================== */
+.form-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+    flex: 1;
+}
+
+/* ==============================
+   BADGES
+============================== */
+.badge {
+    background: #ffcc00;
+    color: black;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* ==============================
+   TABLES
+============================== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table th {
+    background: #111;
+    color: #ffcc00;
+    padding: 12px;
+}
+
+.table td {
+    padding: 14px;
+    border-bottom: 1px solid #444;
+}
+
+.table tr:nth-child(odd) {
+    background: #222;
+}
+
+.table tr:nth-child(even) {
+    background: #2b2b2b;
+}
+
+/* ==============================
+   LEADERBOARD
+============================== */
+
+/* Apply cups to first three rows (after thead) */
+.leaderboard-table tbody tr:nth-child(1) {
+    border-left: 6px solid gold;
+    /* 1st place */
+}
+
+.leaderboard-table tbody tr:nth-child(2) {
+    border-left: 6px solid silver;
+    /* 2nd place */
+}
+
+.leaderboard-table tbody tr:nth-child(3) {
+    border-left: 6px solid #cd7f32;
+    /* 3rd place (bronze) */
+}
+
+/* Align table headers and cells centrally */
+.leaderboard-table th,
+.leaderboard-table td {
+    text-align: center;
+    /* centers text under headings */
+    vertical-align: middle;
+    padding: 12px 14px;
+    /* consistent spacing */
+}
+
+/* Optional: make header slightly bolder and clearer */
+.leaderboard-table th {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* ==============================
+   FLAGS
+============================== */
+.flag {
+    width: 36px;
+    height: 22px;
+    border-radius: 4px;
+}
+
+.flag-safe {
+    background: #28a745;
+}
+
+.flag-hazard {
+    background: #f1c40f;
+}
+
+.flag-danger {
+    background: #e31b23;
+}
+
+.flag-finish {
+    background: #000;
+}
+
+/* ==============================
+   TIMER
+============================== */
+.race-timer {
+    font-size: 60px;
+    text-align: center;
+    color: #ffcc00;
+}
+
+/* ==============================
+   FLAG SCREEN
+============================== */
+.flag-screen {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}
+
+.hidden {
+    display: none;
+}
