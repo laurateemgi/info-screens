@@ -1,91 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>Lap Line Tracker</title>
-    <style>
-        /* Space / breathing room for buttons */
-        #lap-buttons {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            /* wrap buttons to next row */
-            gap: 10px;
-            /* space between buttons */
-        }
 
-        /* Make buttons bigger and easier to press */
-        #lap-buttons button {
-            padding: 20px 40px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-
-        /* Message area spacing */
-        #message {
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        #lap-buttons button:disabled {
-            background-color: rgb(255, 41, 41);
-            /* when background color changes, the text stays visible */
-            color: white;
-            cursor: not-allowed;
-        }
-    </style>
-
+    <!-- =========================
+         Get DATA from GLOBAL & COMPONENTS STYLES
+    ========================= -->
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
 </head>
 
 <body>
-    <h1>Lap Line Tracker</h1>
 
-    <!-- Message area -->
-    <div id="message">Press a car button when it crosses the line.</div>
+    <!-- =========================
+         HEADER
+    ========================= -->
+    <header class="site-header">
+    </header>
 
-    <!-- Lap buttons -->
-    <div id="lap-buttons">
-        <!-- Buttons will be added here -->
+    <!-- =========================
+         PAGE CONTENT
+         - .page: main container, max-width & centered (global.css)
+    ========================= -->
+    <div class="page">
+
+        <!-- PAGE TITLE -->
+        <!-- Uses .page-header, .page-title, .page-subtitle from global.css -->
+        <div class="page-header">
+            <div class="page-title">Lap Line Tracker</div>
+            <div class="page-subtitle">Press the button when each car crosses the line</div>
+        </div>
+
+        <!-- GRID & CARD -->
+        <!-- grid from global.css, card/card-md/card-center from global.css -->
+        <div class="grid">
+            <div class="card card-md card-center">
+                <div class="card-body text-center">
+                    <!-- BUTTONS -->
+                    <!-- Using standard .btn class from components.css -->
+                    <div id="lap-buttons">
+                        <!-- Buttons are generated dynamically via JS -->
+                    </div>
+
+                    <!-- MESSAGE AREA -->
+                    <div id="message" class="placeholder">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- This will make this file talk to the server using Socket.IO -->
+    <!-- =========================
+         SOCKET.IO & BUTTON LOGIC
+         - This part generates lap buttons dynamically
+         - Sends laps to server using socket.io
+         - Applies .btn styling from components.css
+         - Active/disabled states match the lap-button CSS
+    ========================= -->
     <script src="/socket.io/socket.io.js"></script>
-
     <script>
-
-        // const socket = io(); → This opens a connection to the backend.
-        // socket.on("connect", ...) → Confirms the connection and is useful for testing.
-
         const socket = io();
 
         socket.on("connect", () => {
             console.log("Connected to server");
         });
 
-        // Generate buttons for CAR 1 → CAR 8
         const lapButtonsDiv = document.getElementById("lap-buttons");
 
         for (let i = 1; i <= 8; i++) {
             const btn = document.createElement("button");
+
+            // Use the .btn class from components.css for consistent style
+            btn.className = "btn";
             btn.innerText = "CAR " + i;
 
-            // When pressed, show a message
-            btn.onclick = () => {
-                // Show a message
-                document.getElementById("message").innerText = `Lap recorded for CAR ${i}`;
+            btn.addEventListener("click", () => {
+                const message = document.getElementById("message");
 
-                // Send lap to server
+                // Show temporary message
+                message.innerText = `Lap recorded for CAR ${i}`;
+                message.classList.add("placeholder");
+
+                // Emit lap to server
                 socket.emit("recordLap", i);
                 console.log("Lap sent for CAR", i);
 
-                // Disable the button for 1 second to prevent double press
-                btn.disabled = true;  // button is temporarily disabled
+                // Disable button temporarily for 0.8s to prevent double press
+                btn.disabled = true;
+                btn.classList.add("active"); // optional pressed effect
                 setTimeout(() => {
-                    btn.disabled = false; // re-enable after 1 second
-                }, 1000);
-            };
+                    btn.disabled = false;
+                    btn.classList.remove("active");
+                }, 800);
+            });
 
             lapButtonsDiv.appendChild(btn);
         }
