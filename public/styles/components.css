@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
 /* ==============================
    BUTTON SYSTEM
 ============================== */
@@ -19,65 +21,20 @@
     box-sizing: border-box;
 }
 
-/* broken border */
-.btn::before,
-.btn::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 2px solid #000;
-    border-radius: 12px;
-    box-sizing: border-box;
-    pointer-events: none;
-    width: 100%;
-    height: 100%;
-    opacity: 0.5;
-}
-
-.btn::before {
-    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
-}
-
-.btn::after {
-    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
-}
-
+/* Button hover effect */
 .btn:hover:not(:disabled) {
     transform: scale(1.05);
 }
 
-.btn:disabled {
-    background: linear-gradient(145deg, #777, #555);
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-/* primary */
+/* Primary button variant */
 .btn-primary {
     background: #fff;
     color: #000;
 }
 
-/* remove button */
-.remove-btn {
-    background: #e31b23;
-    color: white;
-    border: none;
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-.remove-btn:hover {
-    background: #d9534f;
-    /* slightly lighter red on hover */
-}
 
 /* ==============================
-   LAP BUTTONS
+   LAP BUTTONS special cases
 ============================== */
 #lap-buttons {
     display: grid;
@@ -103,39 +60,17 @@
         inset 0 -1px 2px rgba(255, 255, 255, 0.3);
 }
 
-/* broken border effect */
-#lap-buttons button::before,
-#lap-buttons button::after {
-    content: "";
-    position: absolute;
-    border: 2px solid #000;
-    border-radius: 12px;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    box-sizing: border-box;
-    opacity: 0.5;
-}
-
-#lap-buttons button::before {
-    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
-}
-
-#lap-buttons button::after {
-    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
-}
-
-/* Active / pressed / disabled states */
+/* Active or disabled lap buttons */
 #lap-buttons button.active,
 #lap-buttons button:disabled {
     border-color: #000;
     background: #fff;
     color: #222;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -1px 2px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.3);
 }
 
+/* Duplicate disabled style detected, slightly different */
 #lap-buttons button:disabled {
     background: linear-gradient(145deg, #777, #555);
     color: #ccc;
@@ -143,6 +78,7 @@
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     opacity: 0.8;
 }
+
 
 /* ==============================
    LISTS
@@ -161,7 +97,7 @@
 }
 
 /* ==============================
-   FORMS
+   FORMS on front desk to enter driver name
 ============================== */
 .form-row {
     display: flex;
@@ -179,18 +115,7 @@
 }
 
 /* ==============================
-   BADGES
-============================== */
-.badge {
-    background: #ffcc00;
-    color: black;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-}
-
-/* ==============================
-   TABLES
+   TABLES used for leaderboard and next race
 ============================== */
 .table {
     width: 100%;
@@ -224,6 +149,224 @@
 .table tr {
     height: 60px;
     /* taller rows */
+}
+
+/* ==============================
+   FLAGS
+============================== */
+
+.flag-screen {
+    margin: 0;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 60px;
+    font-family: Orbitron;
+    color: white;
+
+}
+
+.flag-safe {
+    background: #28a745;
+}
+
+.flag-hazard {
+    background: #f1c40f;
+    color: black;
+}
+
+.flag-danger {
+    background: #e31b23;
+}
+
+.flag-finish {
+    background-image: repeating-conic-gradient(black 0% 25%,
+            white 0% 50%);
+    background-size: 250px 250px;
+    color: black;
+    text-shadow: 1px 1px 0 white;
+}
+
+/* ==============================
+   TIMER
+============================== */
+.countdown-container {
+    text-align: center;
+    margin-top: 40px;
+
+}
+
+.race-countdown {
+    font-size: 120px;
+    font-weight: 700;
+    color: #ffcc00;
+    text-align: center;
+    letter-spacing: 4px;
+}
+
+/* ==============================
+   FRONT-DESK SESSION CARDS
+============================== */
+#sessions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(400px, 1fr));
+    gap: 50px;
+    margin-top: 20px;
+    justify-items: center;
+}
+
+/* Center single session card */
+#sessions:has(.session-card:only-child) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+/* Each session is a card */
+.session-card {
+    background: var(--card-bg);
+    /* matches other cards */
+    border: 1px solid #444;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    padding: var(--card-padding);
+    transition: 0.2s;
+    margin-top: 20px;
+
+}
+
+/* Session title */
+.session-card h3 {
+    color: var(--accent-yellow);
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Driver list inside card */
+.session-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.driver-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+    background: #2e2e2e;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    border-bottom: 1px solid #333;
+
+    margin-bottom: 12px;
+    transition: 0.2s;
+}
+
+.driver-row:hover {
+    background: #262626;
+}
+
+/* Driver label + car badge */
+.driver-label {
+    font-size: 18px;
+    font-weight: 600;
+    /* color: white; */
+    text-align: left;
+}
+
+
+.car-badge {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    background: #ffcc00;
+    color: black;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-right: 16px;
+
+}
+
+/* Driver form inputs */
+.driver-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 25px;
+    align-items: center;
+    padding-right: 15px;
+}
+
+.driver-form input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    width: 100%;
+}
+
+
+/* Buttons inside session cards use existing btn & remove-btn styles */
+.session-buttons {
+    display: grid;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+
+}
+
+/* Use existing global button style */
+.driver-form .btn,
+.session-buttons .btn {
+    width: 100%;
+    height: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ==============================
+   REMOVE BUTTON 
+============================== */
+.remove-btn {
+    font-family: 'Orbitron', sans-serif;
+    background: #e31b23;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    min-width: 10px;
+    margin-right: 10px;
+    margin-left: 100px;
+    /* keeps it away from edge */
+
+}
+
+.remove-btn:hover {
+    background: #d9534f;
+}
+
+#error-message {
+    text-align: center;
+    /* centers text horizontally */
+    color: white;
+    font-weight: 600;
+    margin-top: 20px;
+    /* spacing below title */
+    font-size: 18px;
 }
 
 /* ==============================
@@ -262,142 +405,73 @@
     font-size: 18px;
 }
 
-/* ==============================
-   FLAGS
-============================== */
-.flag {
-    width: 36px;
-    height: 22px;
-    border-radius: 4px;
-}
-
-.flag-safe {
-    background: #28a745;
-}
-
-.flag-hazard {
-    background: #f1c40f;
-}
-
-.flag-danger {
-    background: #e31b23;
-}
-
-.flag-finish {
-    background: #000;
-}
 
 /* ==============================
-   TIMER
+   LAP TRACKER MESSAGE (for Lap Line Tracker)
 ============================== */
-.countdown-container {
+#message {
+    margin-top: 30px;
+    /* more breathing room above message */
+    font-weight: bold;
+    color: var(--accent-yellow);
+    /* yellow for visibility */
+    font-size: 18px;
     text-align: center;
-    margin-top: 40px;
-
-}
-
-/* Big racing timer */
-.race-countdown {
-    font-size: 120px;
-    font-weight: 700;
-    color: #ffcc00;
-    text-align: center;
-    letter-spacing: 4px;
-}
-
-/* ==============================
-   FLAG SCREEN
-============================== */
-.flag-screen {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-}
-
-.hidden {
-    display: none;
 }
 
 
 /* ==============================
-   FRONT-DESK SESSION CARDS
+   RACE CONTROL 
 ============================== */
-#sessions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+
+/* RACE CONTROL BUTTONS */
+.controls-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
     margin-top: 20px;
 }
 
-/* Each session is a card */
-.session-card {
-    background: var(--card-bg);
-    /* matches other cards */
-    border: 1px solid #444;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    padding: var(--card-padding);
-    transition: 0.2s;
-}
-
-/* Hover effect for session cards */
-.session-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-}
-
-/* Session title */
-.session-card h3 {
-    color: var(--accent-yellow);
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-/* Driver list inside card */
-.session-card ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-}
-
-.driver-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-/* Driver label + car badge */
-.driver-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.car-badge {
-    background: var(--accent-blue);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    min-width: 20px;
+.controls-grid .btn {
+    min-width: 140px;
+    text-align: center;
+    width: auto;
+    flex: 0 0 auto;
     text-align: center;
 }
 
-/* Driver form inputs */
-.driver-form {
+/* ==============================
+   RACE CONTROL INFO CARDS
+============================== */
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Info text centered inside cards */
+.race-info-text {
+    min-height: 26px;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+/* Make cards same height in top row */
+.grid-3 .card {
+    height: 100%;
+}
+
+/* ==============================
+   RACE CONTROL LAYOUT
+============================== */
+
+.controls-wrapper {
     display: flex;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.driver-form input {
-    flex: 1;
-}
-
-/* Buttons inside session cards use existing btn & remove-btn styles */
-.driver-form .btn,
-.driver-form .remove-btn {
-    margin: 0;
+    justify-content: center;
+    margin-top: 25px;
+    width: fit-content;
+    align-items: center;
+    min-width: 390px;
 }
