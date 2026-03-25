@@ -3,44 +3,112 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Race Control</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/components.css">
 </head>
 
 <body>
-    <h1>Race Control Page</h1>
 
-    <section>
-        <h2>Current session</h2>
-        <p id="current-session">No session selected.</p>
-    </section>
+    <!-- Header -->
+    <header class="site-header"></header>
 
-    <section>
-        <h2>Race status</h2>
-        <p id="race-status">Race not started</p>
-    </section>
+    <!-- Pag4e container -->
+    <div class="page">
 
-    <section>
-        <h2>Current Race Mode</h2>
-        <p id="current-mode">Danger</p>
-    </section>
-
-    <!-- Control buttons used by the Safety Official -->
-    <section>
-        <h2>Controls</h2>
-
-        <!-- Control buttons used by the Safety Official -->
-        <div>
-            <button id="start-race">Start Race</button>
-            <button id="safe-mode">Safe</button>
-            <button id="hazard-mode">Hazard</button>
-            <button id="danger-mode">Danger</button>
-            <button id="finish-mode">Finish</button>
-            <button id="end-session">End Session</button>
+        <!-- Title -->
+        <div class="page-header">
+            <div class="page-title">Race Control</div>
         </div>
-    </section>
 
-    <!-- Load the Socket.IO client library from the server -->
+        <!-- Info cards -->
+        <div class="grid grid-3">
+
+            <!-- Current session -->
+            <div class="card card-md card-center">
+                <div class="card-body">
+                    <h3>Current Session</h3>
+                    <p id="current-session" class="race-info-text">
+                        No session selected.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Race status -->
+            <div class="card card-md card-center">
+                <div class="card-body">
+                    <h3>Race Status</h3>
+                    <p id="race-status" class="race-info-text">
+                        Race not started
+                    </p>
+                </div>
+            </div>
+
+            <!-- Race mode -->
+            <div class="card card-md card-center">
+                <div class="card-body">
+                    <h3>Current Race Mode</h3>
+                    <p id="current-mode" class="race-info-text">
+                        Danger
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Control card with buttons -->
+        <div class="grid">
+
+            <div class="controls-wrapper">
+
+                <div class="card card-lg">
+
+                    <div class="card-body">
+
+                        <h3>Controls</h3>
+
+                        <div class="controls-grid">
+
+                            <button id="start-race" class="btn btn-primary">
+                                Start Race
+                            </button>
+
+                            <button id="safe-mode" class="btn">
+                                Safe
+                            </button>
+
+                            <button id="hazard-mode" class="btn">
+                                Hazard
+                            </button>
+
+                            <button id="danger-mode" class="btn btn-red">
+                                Danger
+                            </button>
+
+                            <button id="finish-mode" class="btn">
+                                Finish
+                            </button>
+
+                            <button id="end-session" class="btn btn-red">
+                                End Session
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Socket.IO  -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
         // Connect to the Socket.IO server
