@@ -1,299 +1,240 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Front Desk</title> <!--/shown in browser tab -->
-  <style>
-li {
-  max-width: 400px;
-  word-break: break-word;
-}
-</style>
 
-<!-- 2.2 adding styling-->
-<style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 40px;
-  background-color: #f5f5f5;
-}
-
-h1 {
-  margin-bottom: 10px;
-}
-
-h2 {
-  margin-top: 30px;
-}
-
-/* session cards */
-
-.session-card {
-  background: white;
-  border: 1px solid #ddd;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  max-width: 600px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* driver rows */
-
-.driver-row {
-  display: span;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: space-between;
-  list-style: none;
-/*  margin-bottom: 6px; 
-  padding: 2px 0;*/
-}
-
-
-/* driver input section */
-
-.driver-form {
-  margin-top: 15px;
-  display: flex;
-  gap: 8px;
-}
-
-/* driver car label */
-
-.driver-label {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* controls spacing cleanly */
-}
-
-.car-badge {
-  background: #2c7be5;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  min-width: 15px;
-  text-align: center;
-}
-
-
-/* input field */
-
-input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  flex-grow: 1;
-}
-
-/* buttons */
-
-button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  background-color: #5daeff;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button:hover {
-  background-color: #95caff;
-}
-
-button:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
-}
-
-.remove-btn {
-  background: transparent ;
-  border: none;
-  font-size: 18px;
-  color: #888;
-  cursor: pointer;
-  opacity: 0.5;
-}
-
-.remove-btn:hover {
-  color: #d9534f;
-  opacity: 1;
-}
-
-
-ul {
-  padding: 0;
-  margin: 10px 0;
-}
-
-
-</style>
-
-
+  <link rel="stylesheet" href="/styles/global.css">
+  <link rel="stylesheet" href="/styles/components.css">
 </head>
 
 <body>
 
-<h1>Racetrack Reception</h1>
-
-<!-- button to create a new race session -->
-<!-- when clicked it calls the createSession() JavaScript function -->
-<button onclick="createSession()">+ New Session</button>
-
-<h2>Sessions</h2>
-
-<div id="error-message" style="color: red; margin-bottom: 10px;"></div>
-
-<div id="sessions"></div> <!--all sessions will be rendered inside this container-->
-
-<script src="/socket.io/socket.io.js"></script> <!-- server connection-->
-
-<script>
+  <!-- Header -->
+  <header class="site-header"></header>
 
 
+  <!-- Page container -->
+  <div class="page">
 
-const socket = io(); //create real-time connection to the server
-
-const sessionsDiv = document.getElementById("sessions");//reference to the HTML container where sessions will be displayed
-let lastActiveSessionInput = null; //to get focus on the last field that was used before sedning the message to server
-
-const errorDiv = document.getElementById("error-message"); //show error messages in error div
-
-function showError(message) {
-  errorDiv.textContent = message;
-
-  setTimeout(() => {
-    errorDiv.textContent = "";
-  }, 3000);
-}
-
-socket.on("errorMessage", (message) => {
-  showError(message);
-});
-
-
-
-//function triggered when the "Create Session" button is pressed
-//it sends an event to the server requesting a new race session
-function createSession() {
-    if (!confirm("Create a new empty session?")) {
-        return;
-    }
-
-    socket.emit("createSession");
-}
-
-
-function addDriver(sessionId) {
-  const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
-  const name = input.value.trim();
-
-    if (!name) {
-    showError("Driver name cannot be empty");
-    return;
-    }
-
-    if (name.length > 20) {
-    showError("Driver name must be 20 characters or less");
-    return;
-    }
-  
-  lastActiveSessionInput = sessionId; //restore focus after rendering
-
-  socket.emit("addDriver", { //send event to server with session ID and driver names
-    sessionId,
-    driverName: name
-  });
-
-  input.value = "";
-  input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
-
-}
-
-
-
-
-function removeDriver(sessionId, driverName) {
-  socket.emit("removeDriver", {
-    sessionId,
-    driverName
-  });
-
-}
-
-function deleteSession(sessionId) {
-  socket.emit("deleteSession", sessionId);
-
-}
-
-//listen for updates from the server when session data changes
-//server sends the updated sessions list
-socket.on("sessionsUpdated", (sessions) => {
-  sessionsDiv.innerHTML = ""; //if update then clear the current session display
-  
-  sessions.forEach(session => {
-    const div = document.createElement("div");
-    div.className = "session-card";
-
-    div.innerHTML = `
-    <h3>${session.id}</h3> 
-
-   <ul>
-
-    ${session.drivers.map(d =>
-        `<li class="driver-row">
-            <span class="driver-label">
-            <span class="car-badge">${d.carNumber}</span>
-            <span class="driver-name">${d.name}</span>
-            </span>
-
-            <button class="remove-btn" onclick="removeDriver('${session.id}','${d.name}')">
-                ×
-            </button>
-        </li>`
-        ).join("")}
-    </ul>
-
-
-    <div class="driver-form">
-        ${session.drivers.length < 8
-        ? `
-            <input
-            id="driver-input-${session.id}"
-            type="text"
-            placeholder="Enter driver name"
-            maxlength="20"
-            onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
-            >
-
-            <button onclick="addDriver('${session.id}')">Add Driver</button>
-        `
-        : `<button disabled>Session Full</button>`
-        }
-
-        <button onclick="deleteSession('${session.id}')">Delete Session</button>
+    <!-- Page title -->
+    <div class="page-header">
+      <div class="page-title">Racetrack Reception</div>
     </div>
-    `;
 
 
-    sessionsDiv.appendChild(div);  //1.2 add the completed session element to the page
+
+    <!-- MUUDETUD! New session button connected to components -->
+    <div class="session-buttons">
+      <button class="btn btn-primary" onclick="createSession()">
+        + New Session
+      </button>
+    </div>
+
+    <!-- MUUDETUD! Error message connected to components -->
+    <div id="error-message" class="error-message"></div>
+
+
+    <!-- Session cards rendered by Socket.IO -->
+    <div id="sessions" class="grid"></div>
+
+  </div>
+
+
+  <!-- server connection -->
+  <script src="/socket.io/socket.io.js"></script>
+
+
+  <script>
+
+    const socket = io(); //create real-time connection to the server
+
+    const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
+
+    let lastActiveSessionInput = null; //to get focus on the last field that was used before sedning the message to server
+
+    const errorDiv = document.getElementById("error-message"); //show error messages in error div
+
+
+
+    /* ERROR HANDLING */
+    function showError(message) {
+      errorDiv.textContent = message;
+
+      setTimeout(() => {
+        errorDiv.textContent = "";
+      }, 3000);
+    }
+
+    socket.on("errorMessage", (message) => {
+      showError(message);
+    });
+
+
+
+    //function triggered when the "Create Session" button is pressed
+    //it sends an event to the server requesting a new race session
+    function createSession() {
+
+      if (!confirm("Create a new empty session?")) {
+        return;
+      }
+
+      socket.emit("createSession");
+    }
+
+
+    /* ADD DRIVER */
+    function addDriver(sessionId) {
+
+      const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
+
+      const name = input.value.trim();
+
+      if (!name) {
+        showError("Driver name cannot be empty");
+        return;
+      }
+
+      if (name.length > 20) {
+        showError("Driver name must be 20 characters or less");
+        return;
+      }
+
+      lastActiveSessionInput = sessionId;
+
+      socket.emit("addDriver", { //send event to server with session ID and driver names
+
+        sessionId,
+        driverName: name
+      });
+
+      input.value = "";
+      input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
+    }
+
+
+
+    /* REMOVE DRIVER */
+    function removeDriver(sessionId, driverName) {
+
+      socket.emit("removeDriver", {
+        sessionId,
+        driverName
+      });
+    }
+
+
+
+    /* DELETE SESSION */
+    function deleteSession(sessionId) {
+      socket.emit("deleteSession", sessionId);
+    }
+
+
+
+    //listen for updates from the server when session data changes
+    //server sends the updated sessions list
+    socket.on("sessionsUpdated", (sessions) => {
+
+      sessionsDiv.innerHTML = ""; //if update then clear the current session display
+
+
+      sessions.forEach(session => {
+
+        const div = document.createElement("div");
+        // MUUDETUD! Connected to components by using session-card
+        div.className = "session-card card card-lg";
+
+
+        div.innerHTML = `
+
+            <h3>${session.id}</h3>
+
+            <ul>
+
+                ${session.drivers.map(d => `
+                    <li class="driver-row">
+
+                      <span class="car-badge">
+                            CAR ${d.carNumber}
+                        </span>
+
+                        <span class="driver-label">
+                            ${d.name}
+                        </span>
+
+                        <button 
+                            class="remove-btn"
+                            onclick="removeDriver('${session.id}','${d.name}')">
+                            X
+                        </button>
+
+                    </li>
+                `).join("")}
+
+            </ul>
+
+
+            <div class="driver-form">
+
+                ${session.drivers.length < 8
+            ? `
+                    <input
+                        id="driver-input-${session.id}"
+                        type="text"
+                        placeholder="Enter driver name"
+                        maxlength="20"
+                        onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
+                    >
+
+                    <button 
+                        class="btn btn-primary"
+                        onclick="addDriver('${session.id}')">
+                        Add Driver
+                    </button>
+                  `
+            : `
+                    <button class="btn" disabled>
+                        Session Full
+                    </button>
+                  `
+          }
+
+               <button 
+          class="btn btn-red"
+         onclick="deleteSession('${session.id}')">
+         Delete Session
+      </button>
+
+    </div>
+
+        `;
+
+
+        sessionsDiv.appendChild(div); //1.2 add the completed session element to the page
+
+      });
+
+
+      if (lastActiveSessionInput) { //restore focus after rendering
+
+
+        const input = document.getElementById(
+          `driver-input-${lastActiveSessionInput}`
+        );
+
+        if (input) {
+          input.focus();
+        }
+      }
 
     });
 
-        if (lastActiveSessionInput) { //restore focus after rendering
-        const input = document.getElementById(`driver-input-${lastActiveSessionInput}`);
-        if (input) {
-            input.focus();
-        }
-        }
-
-  });
-
-
-</script>
+  </script>
 
 </body>
+
 </html>
