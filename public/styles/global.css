@@ -1,10 +1,10 @@
-/* ==============================
-  IMPORT FONT
-============================== */
+/* IMPORT FONT */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
 
 /* ==============================
    GLOBAL VARIABLES
+   Define reusable colors, spacing, and text variables for consistent styling
 ============================== */
 :root {
     --page-padding: 20px;
@@ -26,6 +26,7 @@
 
 /* ==============================
    RESET
+   Apply a global reset for box-sizing, margin, and padding
 ============================== */
 * {
     box-sizing: border-box;
@@ -35,6 +36,7 @@
 
 /* ==============================
    BODY
+   Base font, background gradient, and default text color
 ============================== */
 body {
     font-family: 'Orbitron', sans-serif;
@@ -46,10 +48,12 @@ body {
 
 /* ==============================
    PAGE STRUCTURE
+   Max-width container, page header, title, subtitle, and spacing
 ============================== */
 .page {
     max-width: 1200px;
     margin: auto;
+    ;
 }
 
 /* Page title */
@@ -77,7 +81,7 @@ body {
 
 /* ==============================
    GRID LAYOUT
-   Centered, multiple cards per row
+   Grid system for centering multiple cards per row
 ============================== */
 .grid {
     display: grid;
@@ -89,6 +93,7 @@ body {
 
 /* ==============================
    CARD
+   Card with header, body, size variants, and center alignment
 ============================== */
 .card {
     background: var(--card-bg);
@@ -100,10 +105,6 @@ body {
     width: 100%;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-}
 
 .card-header {
     padding: 14px 16px;
@@ -138,6 +139,7 @@ body {
 
 /* ==============================
    HEADER
+   Main site header with gradient, shadow, and flex layout
 ============================== */
 .site-header {
     background: linear-gradient(135deg, #111, #1e1e1e);
@@ -172,7 +174,11 @@ body {
             var(--accent-blue));
 }
 
-/* Menu */
+/* ==============================
+   MENU
+   Navigation menu with hover effects and dropdowns
+   POLE KASUTUSEL PRAEGU!
+============================== */
 .menu {
     display: flex;
     gap: 40px;
@@ -224,31 +230,4 @@ body {
 
 .dropdown li a:hover {
     background: var(--accent-red);
-}
-
-/* ==============================
-   TRACK LINE DECORATION
-============================== */
-.track-finish {
-    height: 16px;
-    border-radius: 8px;
-    margin-top: 30px;
-    background: linear-gradient(90deg,
-            var(--accent-red),
-            #f1c40f,
-            var(--accent-green),
-            var(--accent-blue));
-}
-
-/* ==============================
-   LAP TRACKER MESSAGE (for Lap Line Tracker)
-============================== */
-#message {
-    margin-top: 30px;
-    /* more breathing room above message */
-    font-weight: bold;
-    color: var(--accent-yellow);
-    /* yellow for visibility */
-    font-size: 18px;
-    text-align: center;
 }
