@@ -91,6 +91,12 @@ body {
     align-items: start;
 }
 
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ==============================
    CARD
    Card with header, body, size variants, and center alignment
@@ -118,6 +124,8 @@ body {
 
 .card-body {
     padding: var(--card-padding);
+    overflow: hidden;
+    /* added for phone and tablet */
 }
 
 .card-sm {
@@ -230,4 +238,74 @@ body {
 
 .dropdown li a:hover {
     background: var(--accent-red);
+}
+
+/* ==============================
+   RESPONSIVE to tablet and phone
+============================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .page-title {
+        font-size: 36px;
+    }
+
+    .grid {
+        gap: 16px;
+    }
+
+    .card-lg {
+        max-width: 100%;
+    }
+
+    .driver-form {
+        gap: 6px;
+    }
+
+    .menu {
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+    .page-title {
+        font-size: 28px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .driver-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .driver-form input,
+    .driver-form button {
+        width: 100%;
+    }
+
+    .menu {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .site-header {
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .track-finish {
+        height: 12px;
+    }
+
+    .race-countdown {
+        font-size: 10vw;
+    }
+
+    /* responsive timer */
 }
