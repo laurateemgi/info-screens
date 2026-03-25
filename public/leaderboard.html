@@ -3,65 +3,55 @@
 
 <head>
     <title>Leaderboard</title>
-    <!-- -------------------------------
-         LINK CSS COMPONENTS
-         Global + Components
-    ------------------------------- -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="/styles/global.css">
     <link rel="stylesheet" href="/styles/components.css">
 </head>
 
 <body>
-    <!-- ==============================
-         PAGE HEADER
-         Uses global.css
-    ============================== -->
+
     <header class="site-header">
     </header>
 
-    <!-- =========================
-         PAGE CONTENT
-         - .page: main container, max-width & centered (global.css)
-    ========================= -->
+    <!-- Page content -->
     <div class="page">
 
-        <!-- PAGE TITLE -->
-        <!-- Uses .page-header, .page-title, .page-subtitle from global.css -->
         <div class="page-header">
             <div class="page-title">Leaderboard</div>
         </div>
 
-        <!-- ==============================
-         MAIN PAGE CONTENT
-         Grid layout for cards
-    ============================== -->
+        <!-- Grid layout for cards-->
         <div class="page">
             <div class="grid">
                 <!-- Leaderboard card -->
                 <div class="card card-md card-center">
                     <div class="card-body">
-                        <table class="table leaderboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Position</th>
-                                    <th>Driver</th>
-                                    <th>Car</th>
-                                    <th>Laps</th>
-                                    <th>Fastest Lap</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaderboard-body">
-                                <tr>
-                                    <td colspan="5" class="placeholder">No race data yet</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-wrapper"> <!-- CHANGED: added wrapper for responsive scrolling -->
+                            <table class="table leaderboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Driver</th>
+                                        <th>Car</th>
+                                        <th>Laps</th>
+                                        <th>Fastest Lap</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body">
+                                    <tr>
+                                        <td colspan="5" class="placeholder">No race data yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Socket.IO script -->
+        <!-- Socket.IO -->
         <script src="/socket.io/socket.io.js"></script>
 
         <script>
