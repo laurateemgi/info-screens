@@ -12,7 +12,7 @@ if (
 
 // 1.1 copy-paste mix&match expressi + socketi kodukatelt, ehk siis serveri skeleton
 const express = require("express");
-const { stat } = require("fs");
+//const { stat } = require("fs"); LAURA commenting it out before we delete - not needed for authentication
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -57,6 +57,9 @@ let timerInterval = null; // 7.1 et timer jooksma ei jääks
 io.on("connection", (socket) => {
   console.log("Client connected");
 
+  socket.isAuthorized = false; //authentication
+  socket.role = null; //will be receptionist, safety or observer (separation of responsibilites so any role could not do anything on other pages)
+
   socket.emit("stateUpdated", state);
 
   socket.on("disconnect", () => {
@@ -82,13 +85,24 @@ io.on("connection", (socket) => {
 
     setTimeout(() => {
       const success = key === roleKeys[role];
-      socket.emit("authResult", { success });
+
+      if (success) { //successful login stores auth on that socket
+        socket.isAuthorized = true;
+        socket.role = role;
+      } else {
+        socket.isAuthorized = false;
+        socket.role = null;
+      }
+
+      socket.emit("authResult", { success }); //sends authentication result to frontend
     }, 500);
 
   });
 
   //1.2.3 all poolikud evendid. conditionale veel juurde vaja.
   socket.on("createSession", () => {   //1.2 session ID creation (unique IDs)
+    if (!socket.isAuthorized || socket.role !== "receptionist") return; //authentication
+
     console.log("createSession event received");
     const session = {
       id: "session-" + sessionCounter,
@@ -105,7 +119,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("deleteSession", (sessionId) => {   //1.2.3
-
+    if (!socket.isAuthorized || socket.role !== "receptionist") return; //auth
     if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada)
 
     state.sessions = state.sessions.filter(s => s.id !== sessionId);
@@ -117,6 +131,7 @@ io.on("connection", (socket) => {
 
   //1.2 addDriver (max 8 drivers per session)
   socket.on("addDriver", ({ sessionId, driverName }) => {
+    if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
@@ -157,6 +172,7 @@ io.on("connection", (socket) => {
 
 
   socket.on("removeDriver", ({ sessionId, driverName }) => { //1.2.3
+    if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
     if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada)
     const session = state.sessions.find(s => s.id === sessionId);
@@ -168,8 +184,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startRace", () => { //1.2.3
+    if (!socket.isAuthorized || socket.role !== "safety") return;
     if (state.raceStarted) return; // 4.1 (16MAR) if cond add (ei saa mitut race'i korraga alustada)
     if (!state.sessions.length) return; //4.1 if cond for if no sessions exist //tõstsin ümber
+
     state.currentSession = state.sessions.shift();
     state.nextSession = state.sessions[0] || null;
     state.raceStarted = true;
@@ -187,12 +205,14 @@ io.on("connection", (socket) => {
 
   socket.on("setFlag", (mode) => { //1.2.3
 
+    if (!socket.isAuthorized || socket.role !== "safety") return;
+
     if (!state.raceStarted) return; // 4.1 (16MAR) if cond add (race ei käi, siis flag ei vahetu)
     if (state.raceEnded) return; // Task 8.3:
     // Kui race on lõpetatud (finishRace() käivitatud),
     // siis lukustame race mode'i täielikult
 
-    state.raceMode = mode;
+    state.raceMode = mode.toUpperCase();
 
     io.emit("flagChanged", state.raceMode); // Saada uuendus kõikidele ekraanidele
     io.emit("stateUpdated", state);
@@ -200,7 +220,7 @@ io.on("connection", (socket) => {
 
 
   socket.on("recordLap", (carNumber) => {//1.2.3
-
+    if (!socket.isAuthorized || socket.role !== "observer") return;
     if (!state.raceStarted || state.raceEnded) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
 
     const now = Date.now();
@@ -227,9 +247,13 @@ io.on("connection", (socket) => {
 
   });
 
-  socket.on("finishRace", () => { finishRace() }); //1.2.3
+  socket.on("finishRace", () => {
+      if (!socket.isAuthorized || socket.role !== "safety") return;
+      finishRace() 
+    }); //1.2.3
 
   socket.on("endSession", () => {  //1.2.3
+    if (!socket.isAuthorized || socket.role !== "safety") return;
 
     // End Session on lubatud ainult pärast FINISH'i
     if (!state.raceEnded) return;

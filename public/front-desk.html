@@ -15,6 +15,41 @@
   <!-- Header -->
   <header class="site-header"></header>
 
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="page">
+    <div class="grid">
+      <div class="card card-md card-center">
+        <div class="card-body">
+
+          <div class="page-header">
+            <div class="page-title">Front Desk Access</div>
+            <div class="page-subtitle">Enter receptionist access key</div>
+          </div>
+
+          <div class="form-row">
+            <input
+              id="access-key"
+              class="input"
+              type="password"
+              placeholder="Access key"
+            >
+          </div>
+
+          <div class="session-buttons">
+            <button class="btn btn-primary" onclick="unlock()">
+              Unlock
+            </button>
+          </div>
+
+          <div id="auth-error" class="error-message"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="app-screen" style="display: none;">
 
   <!-- Page container -->
   <div class="page">
@@ -49,15 +84,62 @@
 
   <script>
 
-    const socket = io(); //create real-time connection to the server
+    let socket = null;
+    const authScreen = document.getElementById("auth-screen");
+    const appScreen = document.getElementById("app-screen");
+    const authError = document.getElementById("auth-error");
 
     const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
-
-    let lastActiveSessionInput = null; //to get focus on the last field that was used before sedning the message to server
-
     const errorDiv = document.getElementById("error-message"); //show error messages in error div
+    let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
 
 
+    /* CONNECTION between our login screen and real app */
+    /* unlock() = authenticate user + open the app if valid + block if not*/
+    function unlock() {
+        const key = document.getElementById("access-key").value.trim();
+
+        if (!key) {
+            authError.textContent = "Access key is required";
+            return;
+        }
+
+        socket = io(); //after clicking Unlock, the connection is built
+
+        socket.on("authResult", ({ success }) => { //listening auth results
+            if (success) {
+            authScreen.style.display = "none";
+            appScreen.style.display = "block";
+            authError.textContent = "";
+
+            registerSocketListeners();
+            } else {
+            authError.textContent = "Incorrect access key";
+            socket.disconnect();
+            socket = null;
+            }
+        });
+
+        socket.emit("verifyKey", {
+            role: "receptionist",
+            key
+        });
+        }
+
+    /* ERROR MESSAGES */
+    function registerSocketListeners() {
+        socket.on("errorMessage", (message) => {
+            showError(message);
+        });
+
+        socket.on("sessionsUpdated", (sessions) => {
+            renderSessions(sessions);
+        });
+
+        socket.on("stateUpdated", (state) => {
+            renderSessions(state.sessions);
+        });
+        }
 
     /* ERROR HANDLING */
     function showError(message) {
@@ -67,10 +149,6 @@
         errorDiv.textContent = "";
       }, 3000);
     }
-
-    socket.on("errorMessage", (message) => {
-      showError(message);
-    });
 
 
 
@@ -137,24 +215,19 @@
 
     //listen for updates from the server when session data changes
     //server sends the updated sessions list
-    socket.on("sessionsUpdated", (sessions) => {
-
+    function renderSessions (sessions) {
       sessionsDiv.innerHTML = ""; //if update then clear the current session display
 
 
       sessions.forEach(session => {
-
         const div = document.createElement("div");
         // MUUDETUD! Connected to components by using session-card
         div.className = "session-card card card-lg";
 
-
         div.innerHTML = `
-
             <h3>${session.id}</h3>
 
             <ul>
-
                 ${session.drivers.map(d => `
                     <li class="driver-row">
 
@@ -174,16 +247,15 @@
 
                     </li>
                 `).join("")}
-
             </ul>
 
 
             <div class="driver-form">
-
                 ${session.drivers.length < 8
             ? `
                     <input
                         id="driver-input-${session.id}"
+                        class="input"
                         type="text"
                         placeholder="Enter driver name"
                         maxlength="20"
@@ -208,20 +280,15 @@
          onclick="deleteSession('${session.id}')">
          Delete Session
       </button>
-
     </div>
 
         `;
 
-
         sessionsDiv.appendChild(div); //1.2 add the completed session element to the page
-
       });
 
 
       if (lastActiveSessionInput) { //restore focus after rendering
-
-
         const input = document.getElementById(
           `driver-input-${lastActiveSessionInput}`
         );
@@ -231,9 +298,11 @@
         }
       }
 
-    });
+    };
 
   </script>
+
+  </div>
 
 </body>
 
