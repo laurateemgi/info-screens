@@ -126,9 +126,9 @@
         });
         }
 
-    /* ERROR MESSAGES */
+    /* SOCKET LISTNERS - so they would be only attached after login (prevents duplicate listeners, invalid sttate updates, memory issues) */
     function registerSocketListeners() {
-        socket.on("errorMessage", (message) => {
+        socket.on("errorMessage", (message) => { //user gets feedback from frontend (socket.ON)
             showError(message);
         });
 
