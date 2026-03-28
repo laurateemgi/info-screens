@@ -17,92 +17,125 @@
     <!-- Header -->
     <header class="site-header"></header>
 
-    <!-- Pag4e container -->
-    <div class="page">
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="page">
 
-        <!-- Title -->
         <div class="page-header">
-            <div class="page-title">Race Control</div>
+            <div class="page-title">Race Control Access</div>
+            <div class="page-subtitle">Enter safety access key</div>
         </div>
 
-        <!-- Info cards -->
-        <div class="grid grid-3">
-
-            <!-- Current session -->
-            <div class="card card-md card-center">
-                <div class="card-body">
-                    <h3>Current Session</h3>
-                    <p id="current-session" class="race-info-text">
-                        No session selected.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Race status -->
-            <div class="card card-md card-center">
-                <div class="card-body">
-                    <h3>Race Status</h3>
-                    <p id="race-status" class="race-info-text">
-                        Race not started
-                    </p>
-                </div>
-            </div>
-
-            <!-- Race mode -->
-            <div class="card card-md card-center">
-                <div class="card-body">
-                    <h3>Current Race Mode</h3>
-                    <p id="current-mode" class="race-info-text">
-                        Danger
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Control card with buttons -->
         <div class="grid">
+            <div class="card card-md card-center">
+                <div class="card-body">
 
-            <div class="controls-wrapper">
-
-                <div class="card card-lg">
-
-                    <div class="card-body">
-
-                        <h3>Controls</h3>
-
-                        <div class="controls-grid">
-
-                            <button id="start-race" class="btn btn-primary">
-                                Start Race
-                            </button>
-
-                            <button id="safe-mode" class="btn">
-                                Safe
-                            </button>
-
-                            <button id="hazard-mode" class="btn">
-                                Hazard
-                            </button>
-
-                            <button id="danger-mode" class="btn btn-red">
-                                Danger
-                            </button>
-
-                            <button id="finish-mode" class="btn">
-                                Finish
-                            </button>
-
-                            <button id="end-session" class="btn btn-red">
-                                End Session
-                            </button>
-
-                        </div>
-
+                    <div class="form-row">
+                        <input
+                            id="access-key"
+                            class="input"
+                            type="password"
+                            placeholder="Access key"
+                        >
                     </div>
 
+                    <div class="session-buttons">
+                        <button class="btn btn-primary" onclick="unlock()">
+                            Unlock
+                        </button>
+                    </div>
+
+                    <div id="auth-error" class="error-message"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SCREEN -->
+    <div id="app-screen" style="display:none;">
+
+        <!-- Page container -->
+        <div class="page">
+
+            <!-- Title -->
+            <div class="page-header">
+                <div class="page-title">Race Control</div>
+            </div>
+
+            <!-- Info cards -->
+            <div class="grid grid-3">
+
+                <!-- Current session -->
+                <div class="card card-md card-center">
+                    <div class="card-body">
+                        <h3>Current Session</h3>
+                        <p id="current-session" class="race-info-text">
+                            No session selected.
+                        </p>
+                    </div>
                 </div>
 
+                <!-- Race status -->
+                <div class="card card-md card-center">
+                    <div class="card-body">
+                        <h3>Race Status</h3>
+                        <p id="race-status" class="race-info-text">
+                            Race not started
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Race mode -->
+                <div class="card card-md card-center">
+                    <div class="card-body">
+                        <h3>Current Race Mode</h3>
+                        <p id="current-mode" class="race-info-text">
+                            Danger
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Control card with buttons -->
+            <div class="grid">
+                <div class="controls-wrapper">
+                    <div class="card card-lg">
+                        <div class="card-body">
+
+                            <h3>Controls</h3>
+
+                            <div class="controls-grid">
+
+                                <button id="start-race" class="btn btn-primary">
+                                    Start Race
+                                </button>
+
+                                <button id="safe-mode" class="btn">
+                                    Safe
+                                </button>
+
+                                <button id="hazard-mode" class="btn">
+                                    Hazard
+                                </button>
+
+                                <button id="danger-mode" class="btn btn-red">
+                                    Danger
+                                </button>
+
+                                <button id="finish-mode" class="btn">
+                                    Finish
+                                </button>
+
+                                <button id="end-session" class="btn btn-red">
+                                    End Session
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -111,8 +144,9 @@
     <!-- Socket.IO  -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // Connect to the Socket.IO server
-        const socket = io();
+        // Do not connect to the Socket.IO server before authentication (below)
+        let socket = null;
+        
 
         // Connect to the Socket.IO server
         const startBtn = document.getElementById("start-race");
@@ -127,6 +161,40 @@
         const raceStatusEl = document.getElementById("race-status");
         const currentModeEl = document.getElementById("current-mode");
 
+        const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
+            accessInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                unlock();
+            }
+            });
+
+
+        /* CONNECTION between our login screen and real app */
+        /* unlock() = authenticate user + open the app if valid + block if not*/
+        function unlock() {
+            const key = document.getElementById("access-key").value;
+
+            socket = io(); //now connect to io server
+ 
+            socket.emit("verifyKey", {
+                role: "safety",
+                key: key
+            });
+
+            socket.on("authResult", ({ success }) => {
+                if (!success) {
+                document.getElementById("auth-error").textContent = "Wrong key";
+                socket.disconnect();
+                socket = null;
+                return;
+                }
+
+                document.getElementById("auth-screen").style.display = "none";
+                document.getElementById("app-screen").style.display = "block";
+
+                registerSocketListeners();
+            });
+            }
 
         function renderControls(state) {
             if (!state.raceStarted && !state.raceEnded) {
@@ -194,39 +262,41 @@
         });
 
         // Listen for updated state from the server
-        socket.on("stateUpdated", (state) => {
-            // Show current session name if one exists
-            if (state.currentSession && state.currentSession.name) {
-                currentSessionEl.textContent = state.currentSession.name;
-            } else if (state.nextSession && state.nextSession.name) {
-                currentSessionEl.textContent = state.nextSession.name;
-            } else if (state.sessions && state.sessions.length > 0) {
-                currentSessionEl.textContent = state.sessions[0].name;
-            } else {
-                currentSessionEl.textContent = "No session selected.";
-            }
+        function registerSocketListeners(){
+            socket.on("stateUpdated", (state) => {
+                // Show current session name if one exists
+                if (state.currentSession && state.currentSession.name) {
+                    currentSessionEl.textContent = state.currentSession.name;
+                } else if (state.nextSession && state.nextSession.name) {
+                    currentSessionEl.textContent = state.nextSession.name;
+                } else if (state.sessions && state.sessions.length > 0) {
+                    currentSessionEl.textContent = state.sessions[0].name;
+                } else {
+                    currentSessionEl.textContent = "No session selected.";
+                }
 
-            // Show race status
-            if (state.raceEnded) {
-                raceStatusEl.textContent = "Race finished";
-            } else if (state.raceStarted) {
-                raceStatusEl.textContent = "Race is running";
-            } else {
-                raceStatusEl.textContent = "Race not started";
-            }
+                // Show race status
+                if (state.raceEnded) {
+                    raceStatusEl.textContent = "Race finished";
+                } else if (state.raceStarted) {
+                    raceStatusEl.textContent = "Race is running";
+                } else {
+                    raceStatusEl.textContent = "Race not started";
+                }
 
-            // Show current race mode
-            currentModeEl.textContent = state.raceMode;
-            renderControls(state);
-        });
+                // Show current race mode
+                currentModeEl.textContent = state.raceMode;
+                renderControls(state);
+            });
 
-        socket.on("sessionsUpdated", (sessions) => {
-            if (sessions && sessions.length > 0) {
-                currentSessionEl.textContent = sessions[0].name;
-            } else {
-                currentSessionEl.textContent = "No session selected.";
-            }
-        });
+            socket.on("sessionsUpdated", (sessions) => {
+                if (sessions && sessions.length > 0) {
+                    currentSessionEl.textContent = sessions[0].name;
+                } else {
+                    currentSessionEl.textContent = "No session selected.";
+                }
+            });
+        }
 
 
     </script>

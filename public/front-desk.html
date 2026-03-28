@@ -93,6 +93,10 @@
     const errorDiv = document.getElementById("error-message"); //show error messages in error div
     let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
 
+    const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
+        accessInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") { unlock();}});    
+
 
     /* CONNECTION between our login screen and real app */
     /* unlock() = authenticate user + open the app if valid + block if not*/
