@@ -397,15 +397,32 @@
 }
 
 
-/* Driver label + car badge */
+/* Driver label */
 .driver-label {
     font-size: 18px;
     font-weight: 600;
-    /* color: white; */
     text-align: left;
 }
 
+/* Tablet view */
+@media (max-width: 1024px) {
+    .driver-label {
+        font-size: 16px;
+    }
+}
 
+/* Phone view */
+@media (max-width: 600px) {
+    .driver-label {
+        font-size: 14px;
+        width: 100%;
+        white-space: nowrap;
+        overflow-x: auto;
+        display: block;
+    }
+}
+
+/* Car badge */
 .car-badge {
     text-align: center;
     font-weight: 700;
@@ -455,7 +472,6 @@
     font-size: 16px;
     width: 100%;
     margin-left: 11px;
-    margin-bottom: 11px;
 }
 
 /* RESPONSIVE: smaller buttons on mobile */
@@ -465,6 +481,10 @@
     .session-buttons .btn {
         font-size: 14px;
         padding: 10px 0;
+    }
+
+    .driver-form input {
+        margin-bottom: 11px;
     }
 }
 
