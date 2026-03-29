@@ -21,16 +21,17 @@ node server.js
 
 #package-lock.json on autogen fail, mille kohta ma ei oska midagi öelda
 
-#REAL README
+
+# REAL README
 
 ## Authentication
 
 The app uses simple role-based access keys to protect each interface.
 
 ### Roles
-Front Desk → RECEPTIONIST_KEY
-Race Control → SAFETY_KEY
-Lap Line Tracker → OBSERVER_KEY`
+* Front Desk → RECEPTIONIST_KEY
+* Race Control → SAFETY_KEY
+* Lap Line Tracker → OBSERVER_KEY`
 
 Keys are defined in `.env`:
 
