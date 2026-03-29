@@ -31,11 +31,12 @@ The app uses simple role-based access keys to protect each interface.
 ### Roles
 * Front Desk → RECEPTIONIST_KEY
 * Race Control → SAFETY_KEY
-* Lap Line Tracker → OBSERVER_KEY`
+* Lap Line Tracker → OBSERVER_KEY
 
 Keys are defined in `.env`:
 
-```RECEPTIONIST_KEY=autod
+```
+RECEPTIONIST_KEY=autod
 SAFETY_KEY=start
 OBSERVER_KEY=ringid
 ```
@@ -44,8 +45,11 @@ OBSERVER_KEY=ringid
 1. User sees an auth screen
 2. Enters access key
 3. Frontend sends the key to server:
-``` socket.emit("verifyKey", { role, key })
+``` 
+socket.emit("verifyKey", { role, key })
+``` 
 Server checks key and responds (with ~500ms delay):
+``` 
 socket.emit("authResult", { success }) 
 ```
 4. If valid → app unlocks, if invalid → error shown, user retries
