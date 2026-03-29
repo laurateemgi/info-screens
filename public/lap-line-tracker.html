@@ -7,84 +7,214 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="styles/global.css">
-    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/components.css">
 </head>
 
 <body>
 
     <!-- Header -->
-    <header class="site-header">
-    </header>
+    <header class="site-header"></header>
 
-    <div class="page">
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="page">
 
-        <!-- Page title -->
         <div class="page-header">
-            <div class="page-title">Lap Line Tracker</div>
-            <div class="page-subtitle">Press the button when each car crosses the line</div>
+            <div class="page-title">Lap Tracker Access</div>
+            <div class="page-subtitle">Enter observer access key</div>
         </div>
 
-        <!-- Grid & Card -->
         <div class="grid">
             <div class="card card-md card-center">
                 <div class="card-body text-center">
-                    <!-- Buttons -->
-                    <div id="lap-buttons">
+
+                    <div class="form-row">
+                        <input
+                            id="access-key"
+                            class="input"
+                            type="password"
+                            placeholder="Access key"
+                        >
                     </div>
 
-                    <!-- Message area -->
-                    <div id="message" class="placeholder">
+                    <div class="session-buttons">
+                        <button class="btn btn-primary" onclick="unlock()">
+                            Unlock
+                        </button>
                     </div>
+
+                    <div id="auth-error" class="error-message"></div>
+
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- SOCKET.IO & BUTTON LOGIC
-         - This part generates lap buttons dynamically
-         - Sends laps to server using socket.io
-         - Applies .btn styling from components.css
-         - Active/disabled states match the lap-button CSS -->
+    <!-- APP SCREEN -->
+    <div id="app-screen" style="display:none;">
+
+        <div class="page">
+
+            <!-- Page title -->
+            <div class="page-header">
+                <div class="page-title">Lap Line Tracker</div>
+                <div class="page-subtitle">Press the button when each car crosses the line</div>
+            </div>
+
+            <!-- Grid & Card -->
+            <div class="grid">
+                <div class="card card-md card-center">
+                    <div class="card-body text-center">
+
+                        <!-- Buttons -->
+                        <div id="lap-buttons"></div>
+
+                        <!-- Message area -->
+                        <div id="message" class="placeholder"></div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        let socket = null;
 
-        socket.on("connect", () => {
-            console.log("Connected to server");
-        });
+        const authScreen = document.getElementById("auth-screen");
+        const appScreen = document.getElementById("app-screen");
+        const authError = document.getElementById("auth-error");
+        const accessKeyInput = document.getElementById("access-key");
 
         const lapButtonsDiv = document.getElementById("lap-buttons");
+        const messageDiv = document.getElementById("message");
 
-        for (let i = 1; i <= 8; i++) {
-            const btn = document.createElement("button");
+        let lapButtons = [];
 
-            // Use the .btn class from components.css for consistent style
-            btn.className = "btn";
-            btn.innerText = "CAR " + i;
+        accessKeyInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                unlock();
+            }
+        });
 
-            btn.addEventListener("click", () => {
-                const message = document.getElementById("message");
+        function unlock() {
+            const key = accessKeyInput.value.trim();
 
-                // Show temporary message
-                message.innerText = `Lap recorded for CAR ${i}`;
-                message.classList.add("placeholder");
+            if (!key) {
+                authError.textContent = "Access key is required";
+                return;
+            }
 
-                // Emit lap to server
-                socket.emit("recordLap", i);
-                console.log("Lap sent for CAR", i);
+            socket = io();
 
-                // Disable button temporarily for 0.8s to prevent double press
-                btn.disabled = true;
-                btn.classList.add("active"); // optional pressed effect
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.classList.remove("active");
-                }, 800);
+            socket.on("authResult", ({ success }) => {
+                if (!success) {
+                    authError.textContent = "Wrong key";
+                    socket.disconnect();
+                    socket = null;
+                    return;
+                }
+
+                authScreen.style.display = "none";
+                appScreen.style.display = "block";
+                authError.textContent = "";
+
+                registerSocketListeners();
+                renderLapButtons();
             });
 
-            lapButtonsDiv.appendChild(btn);
+            socket.emit("verifyKey", {
+                role: "observer",
+                key: key
+            });
+        }
+
+        function registerSocketListeners() {
+            socket.on("connect", () => {
+                console.log("Connected to server");
+            });
+
+            socket.on("stateUpdated", (state) => {
+                updateLapButtonsState(state);
+            });
+
+            socket.on("sessionEnded", () => {
+                disableAllLapButtons();
+                messageDiv.innerText = "Race session ended";
+                messageDiv.classList.add("placeholder");
+            });
+        }
+
+        function renderLapButtons() {
+            lapButtonsDiv.innerHTML = "";
+            lapButtons = [];
+
+            for (let i = 1; i <= 8; i++) {
+                const btn = document.createElement("button");
+                btn.className = "btn";
+                btn.innerText = "CAR " + i;
+                btn.disabled = true;
+
+                btn.addEventListener("click", () => {
+                    if (!socket) return;
+
+                    messageDiv.innerText = `Lap recorded for CAR ${i}`;
+                    messageDiv.classList.add("placeholder");
+
+                    socket.emit("recordLap", i);
+                    console.log("Lap sent for CAR", i);
+
+                    btn.disabled = true;
+                    btn.classList.add("active");
+
+                    setTimeout(() => {
+                        btn.classList.remove("active");
+
+                        if (!btn.dataset.locked) {
+                            btn.disabled = false;
+                        }
+                    }, 800);
+                });
+
+                lapButtonsDiv.appendChild(btn);
+                lapButtons.push(btn);
+            }
+        }
+
+        function updateLapButtonsState(state) {
+            const shouldEnable = state.raceStarted && !state.raceEnded; //buttons are active only when a race is ongoing
+
+            lapButtons.forEach((btn) => {
+                if (shouldEnable) {
+                    btn.disabled = false;
+                    btn.dataset.locked = "";
+                } else {
+                    btn.disabled = true;
+                    btn.dataset.locked = "true";
+                    btn.classList.remove("active");
+                }
+            });
+
+            if (state.raceEnded) {
+                messageDiv.innerText = "Race finished. Waiting for session end.";
+                messageDiv.classList.add("placeholder");
+            } else if (state.raceStarted) {
+                messageDiv.innerText = "Lap tracking active";
+                messageDiv.classList.add("placeholder");
+            } else {
+                messageDiv.innerText = "Waiting for race start";
+                messageDiv.classList.add("placeholder");
+            }
+        }
+
+        function disableAllLapButtons() {
+            lapButtons.forEach((btn) => {
+                btn.disabled = true;
+                btn.dataset.locked = "true";
+                btn.classList.remove("active");
+            });
         }
     </script>
 
