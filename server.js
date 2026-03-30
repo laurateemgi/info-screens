@@ -30,14 +30,15 @@ server.listen(3000, () => {
   console.log("Server running on port 3000");
 });
 
-
+// 13.1 constants
+const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants");
 
 // 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
   sessions: [],
   currentSession: null,
   nextSession: null,
-  raceMode: "DANGER",
+  raceMode: RACE_MODES.DANGER, //13.1 constants
   raceStarted: false,
   raceEnded: false,
   timer: 0,
@@ -135,8 +136,8 @@ io.on("connection", (socket) => {
 
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
-    if (driverName.length > 20) { //!!!!! 1.2 Hardcoded a limit
-      socket.emit("errorMessage", "Driver name must be 20 characters or less");
+    if (driverName.length > MAX_NAME_LENGTH) { //!!!!! 1.2 Hardcoded a limit // 13.1 constants
+      socket.emit("errorMessage", "Driver name must be ${MAX_NAME_LENGTH} characters or less"); //13.1 constants
       return;
     }
 
@@ -145,8 +146,8 @@ io.on("connection", (socket) => {
     if (!session) return;
 
     // max 8 drivers
-    if (session.drivers.length >= 8) {
-      socket.emit("errorMessage", "Maximum 8 drivers allowed in a session");
+    if (session.drivers.length >= MAX_DRIVERS) {
+      socket.emit("errorMessage", "Maximum ${MAX_DRIVERS} drivers allowed in a session"); //13.1 constants
       return;
     }
 
@@ -192,7 +193,7 @@ io.on("connection", (socket) => {
     state.nextSession = state.sessions[0] || null;
     state.raceStarted = true;
     state.raceEnded = false;
-    state.raceMode = "SAFE";
+    state.raceMode = RACE_MODES.SAFE; //13.1 constants
 
     setupLapTracking();
     startTimer();
@@ -212,7 +213,9 @@ io.on("connection", (socket) => {
     // Kui race on lõpetatud (finishRace() käivitatud),
     // siis lukustame race mode'i täielikult
 
-    state.raceMode = mode.toUpperCase();
+    const newMode = mode.toUpperCase();                          //13,1 constants/ lubab kasutada valid modesid
+    if (!Object.values(RACE_MODES).includes(newMode)) return;
+    state.raceMode = newMode;
 
     io.emit("flagChanged", state.raceMode); // Saada uuendus kõikidele ekraanidele
     io.emit("stateUpdated", state);
@@ -223,18 +226,16 @@ io.on("connection", (socket) => {
     if (!socket.isAuthorized || socket.role !== "observer") return;
     if (!state.raceStarted || state.raceEnded) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
 
-    const now = Date.now();
+    const lapData = state.laps[carNumber];
+    if (!lapData) return;
 
-    if (!state.laps[carNumber]) {
-      state.laps[carNumber] = {
-        lap: 0,
-        fastest: null,
-        lastLap: now
-      };
+    const now = Date.now();                                     // 13,1 bugfixing, sest setuplaptracking function teeb juba seda, mis siin oli
+
+    if (lapData.lastLap === null) {
+      lapData.lastLap = now;
       return;
     }
 
-    const lapData = state.laps[carNumber];
     const lapTime = now - lapData.lastLap;
     lapData.lap++;
 
@@ -255,8 +256,8 @@ io.on("connection", (socket) => {
   socket.on("endSession", () => {  //1.2.3
     if (!socket.isAuthorized || socket.role !== "safety") return;
 
-    // End Session on lubatud ainult pärast FINISH'i
-    if (!state.raceEnded) return;
+    // End Session on lubatud ainult pärast FINISH'i //13.1 enne oli if (!state.raceEnded) return;
+    if (!state.currentSession && !state.sessions.length) return; //13.1 lubab sessionit lõpetada ilma race'ita ning erakorraliselt enne race'i lõppu.
 
     if (state.currentSession) { // 4.1 (16 MAR) if cond add (kui race algas)
       state.lastFinishedSession = state.currentSession;
@@ -269,7 +270,7 @@ io.on("connection", (socket) => {
     state.nextSession = state.sessions[0] || null;
     state.raceStarted = false;
     state.raceEnded = false;
-    state.raceMode = "DANGER";
+    state.raceMode = RACE_MODES.DANGER; //13.1 constants
     state.timer = 0;
     state.laps = {};
 
@@ -289,7 +290,7 @@ io.on("connection", (socket) => {
 // 1.2 check for car numbers (must be consecutive even when some drivers are deleted)
 function getAvailableCarNumber(drivers) {
 
-  for (let i = 1; i <= 8; i++) { //there can be 8 drivers
+  for (let i = 1; i <= MAX_DRIVERS; i++) { //there can be 8 drivers //13.1 constants
     const taken = drivers.some(d => d.carNumber === i);
     if (!taken) {
       return i;
@@ -302,7 +303,8 @@ function getAvailableCarNumber(drivers) {
 function startTimer() {
   const raceLength =      //7.1
     process.env.NODE_ENV === "dev"
-      ? 60 : 600;
+      ? TIMER.DEV 
+      : TIMER.PROD; //13.1 constants
 
   state.timer = raceLength;
 
@@ -320,7 +322,7 @@ function finishRace() {
   clearInterval(timerInterval);
   timerInterval = null; //4.1 (16MAR) resetib timerintervali
 
-  state.raceMode = "FINISH";
+  state.raceMode = RACE_MODES.FINISH; //13.1 constants
   state.raceEnded = true;
 
   io.emit("raceFinished", state);

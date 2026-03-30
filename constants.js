@@ -6,7 +6,8 @@ module.exports = {
     RACE_MODES: {
         DANGER: "DANGER",
         SAFE: "SAFE",
-        FINISH: "FINISH"
+        FINISH: "FINISH",
+        HAZARD: "HAZARD"   //13.1 see peaks ka kuskil olema i just remembered
     },
 
     TIMER: {
