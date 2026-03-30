@@ -30,12 +30,7 @@
                 <div class="card-body">
 
                     <div class="form-row">
-                        <input
-                            id="access-key"
-                            class="input"
-                            type="password"
-                            placeholder="Access key"
-                        >
+                        <input id="access-key" class="input" type="password" placeholder="Access key">
                     </div>
 
                     <div class="session-buttons">
@@ -146,7 +141,7 @@
     <script>
         // Do not connect to the Socket.IO server before authentication (below)
         let socket = null;
-        
+
 
         // Connect to the Socket.IO server
         const startBtn = document.getElementById("start-race");
@@ -162,11 +157,11 @@
         const currentModeEl = document.getElementById("current-mode");
 
         const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
-            accessInput.addEventListener("keydown", (event) => {
+        accessInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 unlock();
             }
-            });
+        });
 
 
         /* CONNECTION between our login screen and real app */
@@ -174,27 +169,36 @@
         function unlock() {
             const key = document.getElementById("access-key").value;
 
+            document.getElementById("auth-error").textContent = "";
+
+            // Close any previous socket before creating a new login attempt
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+
             socket = io(); //now connect to io server
- 
+
             socket.emit("verifyKey", {
                 role: "safety",
                 key: key
             });
 
-            socket.on("authResult", ({ success }) => {
+            socket.once("authResult", ({ success }) => { // (9.3) Used 'once' to avoid multiple listeners being added on repeated login attempts
                 if (!success) {
-                document.getElementById("auth-error").textContent = "Wrong key";
-                socket.disconnect();
-                socket = null;
-                return;
+                    document.getElementById("auth-error").textContent = "Wrong key";
+                    socket.disconnect();
+                    socket = null;
+                    return;
                 }
 
                 document.getElementById("auth-screen").style.display = "none";
                 document.getElementById("app-screen").style.display = "block";
+                document.getElementById("access-key").value = "";
 
                 registerSocketListeners();
             });
-            }
+        }
 
         function renderControls(state) {
             if (!state.raceStarted && !state.raceEnded) {
@@ -262,7 +266,7 @@
         });
 
         // Listen for updated state from the server
-        function registerSocketListeners(){
+        function registerSocketListeners() {
             socket.on("stateUpdated", (state) => {
                 // Show current session name if one exists
                 if (state.currentSession && state.currentSession.name) {
