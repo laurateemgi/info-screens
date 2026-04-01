@@ -175,9 +175,9 @@ io.on("connection", (socket) => {
   socket.on("removeDriver", ({ sessionId, driverName }) => { //1.2.3
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
-    if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada)
+    //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada) 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
     const session = state.sessions.find(s => s.id === sessionId);
-    if (!session) return; //prevents server crashes if a bad request comes in
+    //if (!session) return; //prevents server crashes if a bad request comes in 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
 
     session.drivers = session.drivers.filter(d => d.name !== driverName);
 
