@@ -121,7 +121,7 @@ io.on("connection", (socket) => {
 
   socket.on("deleteSession", (sessionId) => {   //1.2.3
     if (!socket.isAuthorized || socket.role !== "receptionist") return; //auth
-    if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada)
+    //if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada) 010426 front desk ei saa sessionit 
 
     state.sessions = state.sessions.filter(s => s.id !== sessionId);
 
