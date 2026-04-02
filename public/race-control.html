@@ -142,8 +142,13 @@
         // Do not connect to the Socket.IO server before authentication (below)
         let socket = null;
 
+        //authentication elements
+        const authScreen = document.getElementById("auth-screen");
+        const appScreen = document.getElementById("app-screen");
+        const authError = document.getElementById("auth-error");
+        const accessKeyInput = document.getElementById("access-key");
 
-        // Connect to the Socket.IO server
+        //connect to the Socket.IO server
         const startBtn = document.getElementById("start-race");
         const safeBtn = document.getElementById("safe-mode");
         const hazardBtn = document.getElementById("hazard-mode");
@@ -151,13 +156,14 @@
         const finishBtn = document.getElementById("finish-mode");
         const endSessionBtn = document.getElementById("end-session");
 
-        // Text elements
+
+
+        //text elements
         const currentSessionEl = document.getElementById("current-session");
         const raceStatusEl = document.getElementById("race-status");
         const currentModeEl = document.getElementById("current-mode");
 
-        const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
-        accessInput.addEventListener("keydown", (event) => {
+        accessKeyInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 unlock();
             }
@@ -189,11 +195,11 @@
                     authError.textContent = "Incorrect access key";
                     socket.disconnect();
                     socket = null;
-                    document.getElementById("access-key").focus();
+                    accessKeyInput.focus();
                     return;
                 }
 
-                document.getElementById("access-key").value = "";
+                accessKeyInput.value = "";
                 authScreen.style.display = "none";
                 appScreen.style.display = "block";
                 authError.textContent = "";
@@ -271,12 +277,12 @@
         function registerSocketListeners() {
             socket.on("stateUpdated", (state) => {
                 // Show current session name if one exists
-                if (state.currentSession && state.currentSession.name) {
-                    currentSessionEl.textContent = state.currentSession.name;
-                } else if (state.nextSession && state.nextSession.name) {
-                    currentSessionEl.textContent = state.nextSession.name;
+                if (state.currentSession && state.currentSession.id) {
+                    currentSessionEl.textContent = state.currentSession.id;
+                } else if (state.nextSession && state.nextSession.id) {
+                    currentSessionEl.textContent = state.nextSession.id;
                 } else if (state.sessions && state.sessions.length > 0) {
-                    currentSessionEl.textContent = state.sessions[0].name;
+                    currentSessionEl.textContent = state.sessions[0].id;
                 } else {
                     currentSessionEl.textContent = "No session selected.";
                 }
@@ -297,7 +303,7 @@
 
             socket.on("sessionsUpdated", (sessions) => {
                 if (sessions && sessions.length > 0) {
-                    currentSessionEl.textContent = sessions[0].name;
+                    currentSessionEl.textContent = sessions[0].id;
                 } else {
                     currentSessionEl.textContent = "No session selected.";
                 }
