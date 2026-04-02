@@ -180,12 +180,12 @@
       const name = input.value.trim();
 
       if (!name) {
-        showError("Driver name cannot be empty");
+        showSessionError(sessionId,"Driver name cannot be empty");
         return;
       }
 
-      if (name.length > 20) {
-        showError("Driver name must be 20 characters or less");
+      if (name.length > MAX_NAME_LENGTH) {
+        showSessionError(sessionId,"Max characters or less");
         return;
       }
 
@@ -201,7 +201,21 @@
       input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
     }
 
+    /* SHOW ERROR MESSAGE AFTER BUTTONS */
+    function showSessionError(sessionId, message) {
+        const errorEl = document.getElementById(`session-error-${sessionId}`);
+        if (!errorEl) return;
 
+        errorEl.textContent = message;
+        errorEl.style.opacity = "1";
+
+        clearTimeout(errorEl.hideTimeout);
+
+        errorEl.hideTimeout = setTimeout(() => {
+            errorEl.style.opacity = "0";
+            errorEl.textContent = "";
+        }, 2500);
+        }
 
     /* REMOVE DRIVER */
     function removeDriver(sessionId, driverName) {
@@ -259,14 +273,14 @@
 
 
             <div class="driver-form">
-                ${session.drivers.length < 8
+                ${session.drivers.length < MAX_DRIVERS
             ? `
                     <input
                         id="driver-input-${session.id}"
                         class="input"
                         type="text"
                         placeholder="Enter driver name"
-                        maxlength="20"
+                        maxlength=MAX_NAME_LENGTH
                         onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
                     >
 
@@ -277,7 +291,8 @@
                     </button>
                   `
             : `
-                    <button class="btn" disabled>
+                    <button class="btn btn-disabled"
+                    onclick="showSessionError('${session.id}', 'Session is full - max 8 drivers')">
                         Session Full
                     </button>
                   `
@@ -289,6 +304,8 @@
          Delete Session
       </button>
     </div>
+
+    <div id="session-error-${session.id}" class="session-inline-error"></div>
 
         `;
 
