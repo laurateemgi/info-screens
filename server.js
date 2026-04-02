@@ -90,12 +90,24 @@ io.on("connection", (socket) => {
       if (success) { //successful login stores auth on that socket
         socket.isAuthorized = true;
         socket.role = role;
+
+        socket.emit("authResult", { success: true });
+
+        socket.emit("initConstants", {
+          MAX_DRIVERS,
+          MAX_NAME_LENGTH,
+          RACE_MODES,
+          TIMER
+        });
+
+        socket.emit("sessionsUpdated", state.sessions);
+        socket.emit("stateUpdated", state);
+
       } else {
         socket.isAuthorized = false;
         socket.role = null;
+        socket.emit("authResult", { success: false });
       }
-
-      socket.emit("authResult", { success }); //sends authentication result to frontend
     }, 500);
 
   });
@@ -137,7 +149,7 @@ io.on("connection", (socket) => {
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
     if (driverName.length > MAX_NAME_LENGTH) { //!!!!! 1.2 Hardcoded a limit // 13.1 constants
-      socket.emit("errorMessage", "Driver name must be ${MAX_NAME_LENGTH} characters or less"); //13.1 constants
+        socket.emit("errorMessage", `Driver name must be ${MAX_NAME_LENGTH} characters or less`);
       return;
     }
 
@@ -147,8 +159,8 @@ io.on("connection", (socket) => {
 
     // max 8 drivers
     if (session.drivers.length >= MAX_DRIVERS) {
-      socket.emit("errorMessage", "Maximum ${MAX_DRIVERS} drivers allowed in a session"); //13.1 constants
-      return;
+        socket.emit("errorMessage", `Maximum ${MAX_DRIVERS} drivers allowed in a session`);     
+        return;
     }
 
     // prevent duplicate driver names
@@ -178,9 +190,7 @@ io.on("connection", (socket) => {
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada) 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
     const session = state.sessions.find(s => s.id === sessionId);
     //if (!session) return; //prevents server crashes if a bad request comes in 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
-
     session.drivers = session.drivers.filter(d => d.name !== driverName);
-
     io.emit("sessionsUpdated", state.sessions);
   });
 
