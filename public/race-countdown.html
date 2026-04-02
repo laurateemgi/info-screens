@@ -28,7 +28,26 @@
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
-        <script src="/js/race-countdown.js"></script>
+        <script>
+            const socket = io();
+            const countdownEl = document.getElementById("countdown");
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+            }
+
+            socket.on("timerUpdated", (time) => {
+                countdownEl.textContent = formatTime(time);
+            });
+
+            socket.on("stateUpdated", (state) => {
+                if (typeof state.timer === "number") {
+                    countdownEl.textContent = formatTime(state.timer);
+                }
+            });
+        </script>
 </body>
 
 </html>
