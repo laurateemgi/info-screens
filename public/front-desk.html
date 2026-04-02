@@ -110,22 +110,26 @@
 
         socket = io(); //after clicking Unlock, the connection is built
 
-        socket.on("authResult", ({ success }) => { //listening auth results
-            if (success) {
-            authScreen.style.display = "none";
-            appScreen.style.display = "block";
+        //AUTHENTICATION 
+        socket.once("authResult", ({ success }) => { //listen for auth result from server ONCE per login attempt
+            if (!success) { //FAILED AUTH
+                authError.textContent = "Incorrect access key";
+                socket.disconnect();
+                socket = null; //reset socket variable
+                document.getElementById("access-key").focus(); //focus input so user can retry quickly
+                return;
+            }
+            //if auth is SUCCESSFUL
+            document.getElementById("access-key").value = ""; //clear input field (security + clean UI)
+            authScreen.style.display = "none"; //hide login screen
+            appScreen.style.display = "block"; 
             authError.textContent = "";
 
             registerSocketListeners();
-            } else {
-            authError.textContent = "Incorrect access key";
-            socket.disconnect();
-            socket = null;
-            }
         });
 
         socket.emit("verifyKey", {
-            role: "receptionist",
+            role: "receptionist", //defines which role can log in
             key
         });
         }

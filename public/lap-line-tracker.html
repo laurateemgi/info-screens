@@ -109,14 +109,17 @@
 
             socket = io();
 
-            socket.on("authResult", ({ success }) => {
+            // AUTHENTICATION
+            socket.once("authResult", ({ success }) => {
                 if (!success) {
-                    authError.textContent = "Wrong key";
+                    authError.textContent = "Incorrect access key";
                     socket.disconnect();
                     socket = null;
+                    document.getElementById("access-key").focus();
                     return;
                 }
 
+                document.getElementById("access-key").value = "";
                 authScreen.style.display = "none";
                 appScreen.style.display = "block";
                 authError.textContent = "";

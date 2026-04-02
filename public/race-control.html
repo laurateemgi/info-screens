@@ -184,17 +184,19 @@
                 key: key
             });
 
-            socket.once("authResult", ({ success }) => { // (9.3) Used 'once' to avoid multiple listeners being added on repeated login attempts
+            socket.once("authResult", ({ success }) => {
                 if (!success) {
-                    document.getElementById("auth-error").textContent = "Wrong key";
+                    authError.textContent = "Incorrect access key";
                     socket.disconnect();
                     socket = null;
+                    document.getElementById("access-key").focus();
                     return;
                 }
 
-                document.getElementById("auth-screen").style.display = "none";
-                document.getElementById("app-screen").style.display = "block";
                 document.getElementById("access-key").value = "";
+                authScreen.style.display = "none";
+                appScreen.style.display = "block";
+                authError.textContent = "";
 
                 registerSocketListeners();
             });
