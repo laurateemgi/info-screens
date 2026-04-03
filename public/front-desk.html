@@ -69,7 +69,7 @@
     </div>
 
     <!-- MUUDETUD! Error message connected to components -->
-    <div id="error-message" class="error-message"></div>
+    <div id="error-message" class="error-message"></div> <!-- USED ONLY FOR GLOBAL ERRORS (session specific are under buttons)-->
 
 
     <!-- Session cards rendered by Socket.IO -->
@@ -111,7 +111,6 @@
         }
 
         socket = io(); //after clicking Unlock, the connection is built
-
         registerSocketListeners();
 
         //AUTHENTICATION 
@@ -129,7 +128,6 @@
             appScreen.style.display = "block"; 
             authError.textContent = "";
 
-            registerSocketListeners();
         });
 
         socket.emit("verifyKey", {
@@ -146,8 +144,12 @@
             MAX_NAME_LENGTH = constants.MAX_NAME_LENGTH;
             });
 
-        socket.on("errorMessage", (message) => { //user gets feedback from frontend (socket.ON)
+        socket.on("errorMessage", (sessoionId, message) => { //user gets feedback from frontend (socket.ON)
+            if (sessionId){
+                showSessionError(sessionId, message);
+            } else {
             showError(message);
+            }
         });
 
         socket.on("sessionsUpdated", (sessions) => {
@@ -240,8 +242,11 @@
 
     /* DELETE SESSION */
     function deleteSession(sessionId) {
-      socket.emit("deleteSession", sessionId);
-    }
+        if (!confirm("Delete this session?")) {
+            return;
+        }
+        socket.emit("deleteSession", sessionId);
+     }
 
 
 
@@ -302,7 +307,7 @@
                   `
             : `
                     <button class="btn btn-disabled"
-                    onclick="showSessionError('${session.id}', 'Session is full - max 8 drivers')">
+                    onclick="showSessionError('${session.id}', 'Session is full - max ${MAX_DRIVERS} drivers')'>
                         Session Full
                     </button>
                   `
