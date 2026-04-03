@@ -383,15 +383,14 @@
 
 .driver-row {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 78px minmax(0, 1fr) 44px; /* name can shrink properly inside grid */
     align-items: center;
-    gap: 20px;
+    gap: 12px;
     background: #2e2e2e;
-    padding: 12px 20px;
+    padding: 12px 16px;
     border-radius: 10px;
     border: 1px solid #444;
     border-bottom: 1px solid #333;
-
     margin-bottom: 12px;
     transition: 0.2s;
 }
@@ -403,7 +402,8 @@
 /* RESPONSIVE: shrink driver rows on mobile */
 @media (max-width: 600px) {
     .driver-row {
-        gap: 12px;
+        grid-template-columns: 70px minmax(0, 1fr) 44px;
+        gap: 10px;
         padding: 10px 12px;
         align-items: center;
     }
@@ -415,6 +415,13 @@
     font-size: 18px;
     font-weight: 600;
     text-align: left;
+    display: block;
+    min-width: 0;
+    width: 100%;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
 }
 
 /* Tablet view */
@@ -428,10 +435,6 @@
 @media (max-width: 600px) {
     .driver-label {
         font-size: 14px;
-        width: 100%;
-        white-space: nowrap;
-        overflow-x: auto;
-        display: block;
     }
 }
 
@@ -439,21 +442,21 @@
 .car-badge {
     text-align: center;
     font-weight: 700;
-    font-size: 14px;
-    width: 75px;
+    font-size: 12px;
+    width: 100%;
     background: #ffcc00;
     color: black;
-    padding: 4px 10px;
+    padding: 3px 5px;
     border-radius: 6px;
-    margin-right: 16px;
-
+    margin-right: 0px;
+    box-sizing: border-box;
 }
 
 /* RESPONSIVE: badge font smaller on mobile */
 @media (max-width: 600px) {
     .car-badge {
-        font-size: 12px;
-        padding: 3px 8px;
+        font-size: 11px;
+        padding: 3px 4px;
     }
 }
 
@@ -529,16 +532,22 @@
     background: #e31b23;
     color: white;
     border: none;
-    padding: 4px 10px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     transition: 0.2s;
-    min-width: 10px;
-    margin-right: 10px;
-    margin-left: auto;
-    /* keeps it away from edge */
-
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
 }
 
 .remove-btn:hover {
@@ -569,16 +578,6 @@
 /* ==============================
    RESPONSIVE: Phones / small screens
 ============================== */
-@media (max-width: 600px) {
-    .remove-btn {
-        margin-left: 0;
-        /* remove extra left margin on small screens */
-        font-size: 12px;
-        /* smaller font to fit mobile layouts */
-        padding: 3px 8px;
-        /* reduce padding to save space */
-        width: 50px;
-    }
 
     #error-message {
         font-size: 16px;
@@ -586,18 +585,11 @@
         margin-top: 15px;
         /* reduce vertical spacing */
     }
-}
 
 /* ==============================
    RESPONSIVE: Tablets
 ============================== */
-@media (max-width: 1024px) {
-    .remove-btn {
-        margin-left: 20px;
-        /* moderate spacing for tablet screens */
-        font-size: 13px;
-    }
-}
+
 
 /* ==============================
    LEADERBOARD

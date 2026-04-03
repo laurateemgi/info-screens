@@ -108,7 +108,6 @@
         }
 
         socket = io(); //after clicking Unlock, the connection is built
-        registerSocketListeners();
 
         //AUTHENTICATION 
         socket.once("authResult", ({ success }) => { //listen for auth result from server ONCE per login attempt
@@ -124,6 +123,8 @@
             authScreen.style.display = "none"; //hide login screen
             appScreen.style.display = "block"; 
             authError.textContent = "";
+
+            registerSocketListeners();
 
         });
 
