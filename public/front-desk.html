@@ -68,9 +68,6 @@
       </button>
     </div>
 
-    <!-- MUUDETUD! Error message connected to components -->
-    <div id="error-message" class="error-message"></div> <!-- USED ONLY FOR GLOBAL ERRORS (session specific are under buttons)-->
-
 
     <!-- Session cards rendered by Socket.IO -->
     <div id="sessions" class="grid"></div>
@@ -83,7 +80,7 @@
 
 
   <script>
-
+    let currentSessions = [];
     let socket = null;
     let MAX_DRIVERS = 8; //fallback values until server sends the real ones
     let MAX_NAME_LENGTH = 20;
@@ -92,7 +89,7 @@
     const authError = document.getElementById("auth-error");
 
     const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
-    const errorDiv = document.getElementById("error-message"); //show error messages in error div
+/// deleting now as we need front end errors first   const errorDiv = document.getElementById("error-message"); //show error messages in error div
     let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
 
     const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
@@ -144,12 +141,9 @@
             MAX_NAME_LENGTH = constants.MAX_NAME_LENGTH;
             });
 
-        socket.on("errorMessage", (sessoionId, message) => { //user gets feedback from frontend (socket.ON)
-            if (sessionId){
-                showSessionError(sessionId, message);
-            } else {
-            showError(message);
-            }
+        socket.on("errorMessage", ({ sessionId, message }) => { //user gets feedback from frontend (socket.ON)
+            if (!sessionId) return;
+            showTemporarySessionError(sessionId, message);
         });
 
         socket.on("sessionsUpdated", (sessions) => {
@@ -160,15 +154,6 @@
             renderSessions(state.sessions);
         });
         }
-
-    /* ERROR HANDLING */
-    function showError(message) {
-      errorDiv.textContent = message;
-
-      setTimeout(() => {
-        errorDiv.textContent = "";
-      }, 3000);
-    }
 
 
 
@@ -186,25 +171,30 @@
 
     /* ADD DRIVER */
     function addDriver(sessionId) {
+    console.log("addDriver clicked", sessionId); //TEMPORARY, delete later
 
       const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
+   
+     if (input.disabled) {
+        showTemporarySessionError(sessionId, `Session is full - max ${MAX_DRIVERS} drivers`);
+        return;
+     }
 
       const name = input.value.trim();
 
       if (!name) {
-        showSessionError(sessionId,"Driver name cannot be empty");
+        showTemporarySessionError(sessionId,"Driver name cannot be empty");
         return;
       }
 
       if (name.length > MAX_NAME_LENGTH) {
-        showSessionError(sessionId, `Driver name must be ${MAX_NAME_LENGTH} characters or less`);        
+        showTemporarySessionError(sessionId, `Max ${MAX_NAME_LENGTH} characters allowed`);        
         return;
       }
 
       lastActiveSessionInput = sessionId;
 
       socket.emit("addDriver", { //send event to server with session ID and driver names
-
         sessionId,
         driverName: name
       });
@@ -213,8 +203,17 @@
       input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
     }
 
-    /* SHOW ERROR MESSAGE AFTER BUTTONS */
-    function showSessionError(sessionId, message) {
+    /* PERSISTENT ERROR - for full session */
+    function showPersistentSessionError(sessionId, message) {
+        const el = document.getElementById(`session-error-${sessionId}`);
+        if (!el) return;
+
+        el.textContent = message;
+        el.style.opacity = "1";
+    }
+
+    /* SHOW TEMPORARY ERROR MESSAGE AFTER BUTTONS */
+    function showTemporarySessionError(sessionId, message) {
         const errorEl = document.getElementById(`session-error-${sessionId}`);
         if (!errorEl) return;
 
@@ -228,6 +227,17 @@
             errorEl.textContent = "";
         }, 2500);
         }
+    
+    /* CLEAR SESSION MESSAGE */
+    function clearSessionError(sessionId) {
+    const errorEl = document.getElementById(`session-error-${sessionId}`);
+    if (!errorEl) return;
+
+    clearTimeout(errorEl.hideTimeout);
+    errorEl.textContent = "";
+    errorEl.style.opacity = "0";
+    }
+
 
     /* REMOVE DRIVER */
     function removeDriver(sessionId, driverName) {
@@ -248,18 +258,54 @@
         socket.emit("deleteSession", sessionId);
      }
 
+    /* SHOW DRIVER NAME LENGTH ERROR INSTANTLY */
+    function validateDriverName(sessionId) {
+        const input = document.getElementById(`driver-input-${sessionId}`);
+        if (!input) return;
+
+        const name = input.value;
+
+        if (name.length > MAX_NAME_LENGTH) {
+            showTemporarySessionError(
+            sessionId,
+            `Max ${MAX_NAME_LENGTH} characters allowed`
+            );
+        } else {
+            // only clear if not full-session error
+            const session = getSessionById(sessionId);
+            if (session && session.drivers.length < MAX_DRIVERS) {
+            clearSessionError(sessionId);
+            }
+        }
+     }
+
+    /* HELPER TO ACCESS SESSION */
+    function getSessionById(sessionId) {
+    return currentSessions.find(session => session.id === sessionId);
+    }
 
 
     //listen for updates from the server when session data changes
     //server sends the updated sessions list
     function renderSessions (sessions) {
-      sessionsDiv.innerHTML = ""; //if update then clear the current session display
+        currentSessions = sessions;
+        sessionsDiv.innerHTML = ""; //if update then clear the current session display
 
-
-      sessions.forEach(session => {
+        sessions.forEach(session => {
         const div = document.createElement("div");
         // MUUDETUD! Connected to components by using session-card
         div.className = "session-card card card-lg";
+
+        const isFull = session.drivers.length >= MAX_DRIVERS;
+
+        const addButtonHtml = `
+        <button
+            type="button"
+            class="btn btn-primary ${isFull ? 'btn-disabled' : ''}"
+            onclick="addDriver('${session.id}')">
+            Add Driver
+        </button>
+        `;      
 
         div.innerHTML = `
             <h3>${session.id}</h3>
@@ -267,10 +313,8 @@
             <ul>
                 ${session.drivers.map(d => `
                     <li class="driver-row">
-
                       <span class="car-badge">
-                            CAR ${d.carNumber}
-                        </span>
+                            CAR ${d.carNumber} </span>
 
                         <span class="driver-label">
                             ${d.name}
@@ -281,63 +325,55 @@
                             onclick="removeDriver('${session.id}','${d.name}')">
                             X
                         </button>
-
                     </li>
                 `).join("")}
             </ul>
 
 
             <div class="driver-form">
-                ${session.drivers.length < MAX_DRIVERS
-            ? `
-                    <input
-                        id="driver-input-${session.id}"
-                        class="input"
-                        type="text"
-                        placeholder="Enter driver name"
-                        maxlength="${MAX_NAME_LENGTH}"
-                        onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
-                    >
+                <input
+                    id="driver-input-${session.id}"
+                    class="input"
+                    type="text"
+                    placeholder="Enter driver name"
+                    maxlength="${MAX_NAME_LENGTH + 3}" 
+                    ${isFull ? "disabled" : ""}
+                    oninput="validateDriverName('${session.id}')"
+                    onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
+                >
 
-                    <button 
-                        class="btn btn-primary"
-                        onclick="addDriver('${session.id}')">
-                        Add Driver
-                    </button>
-                  `
-            : `
-                    <button class="btn btn-disabled"
-                    onclick="showSessionError('${session.id}', 'Session is full - max ${MAX_DRIVERS} drivers')'>
-                        Session Full
-                    </button>
-                  `
-          }
+                ${addButtonHtml}
 
-               <button 
-          class="btn btn-red"
-         onclick="deleteSession('${session.id}')">
-         Delete Session
-      </button>
-    </div>
+                <button 
+                    class="btn btn-red"
+                    onclick="deleteSession('${session.id}')">
+                    Delete Session
+                </button>
+            </div>
 
-    <div id="session-error-${session.id}" class="session-inline-error"></div>
-
+            <div id="session-error-${session.id}" class="session-inline-error"></div>
         `;
 
         sessionsDiv.appendChild(div); //1.2 add the completed session element to the page
+            if (isFull) {
+            setTimeout(() => {
+                showPersistentSessionError(
+                session.id,
+                `Session is full - max ${MAX_DRIVERS} drivers`
+                );
+            }, 0);
+            } else {
+            clearSessionError(session.id);
+            }
       });
 
 
       if (lastActiveSessionInput) { //restore focus after rendering
-        const input = document.getElementById(
-          `driver-input-${lastActiveSessionInput}`
-        );
-
+        const input = document.getElementById(`driver-input-${lastActiveSessionInput}`);
         if (input) {
           input.focus();
         }
       }
-
     };
 
   </script>

@@ -146,28 +146,47 @@ io.on("connection", (socket) => {
   socket.on("addDriver", ({ sessionId, driverName }) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
+    const session = state.sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
-    if (driverName.length > MAX_NAME_LENGTH) { //!!!!! 1.2 Hardcoded a limit // 13.1 constants
-        socket.emit("errorMessage", `Driver name must be ${MAX_NAME_LENGTH} characters or less`);
+
+    if (!driverName) {
+      socket.emit("errorMessage", {
+        sessionId,
+        message: "Driver name cannot be empty"
+      });
       return;
     }
 
-    const session = state.sessions.find(s => s.id === sessionId);
-
-    if (!session) return;
+    if (driverName.length > MAX_NAME_LENGTH) {
+      socket.emit("errorMessage", {
+        sessionId,
+        message: `Driver name must be ${MAX_NAME_LENGTH} characters or less`
+      });
+      return;
+    }
 
     // max 8 drivers
     if (session.drivers.length >= MAX_DRIVERS) {
-        socket.emit("errorMessage", `Maximum ${MAX_DRIVERS} drivers allowed in a session`);     
-        return;
+      socket.emit("errorMessage", {
+        sessionId,
+        message: `Session is full - max ${MAX_DRIVERS} drivers`
+      });
+      return;
     }
 
     // prevent duplicate driver names
-    const nameExists = session.drivers.some(d => d.name === driverName);
+    const normalizedName = driverName.toLowerCase();
+
+    const nameExists = session.drivers.some(d => d.name.trim().toLowerCase() === normalizedName);
 
     if (nameExists) {
-      socket.emit("errorMessage", "Driver name already exists in this session");
+      socket.emit("errorMessage", {
+        sessionId,
+        message: "Driver name already exists in this session"
+      });
       return;
     }
 
