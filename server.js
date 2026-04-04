@@ -217,6 +217,9 @@ io.on("connection", (socket) => {
     if (!socket.isAuthorized || socket.role !== "safety") return;
     if (state.raceStarted) return; // 4.1 (16MAR) if cond add (ei saa mitut race'i korraga alustada)
     if (!state.sessions.length) return; //4.1 if cond for if no sessions exist //tõstsin ümber
+    
+    const nextSession = state.sessions[0];             //10.1 cant start race w/o drivers
+    if (!nextSession || nextSession.drivers.length === 0) return; //10.1 cant start race w/o drivers
 
     state.currentSession = state.sessions.shift();
     state.nextSession = state.sessions[0] || null;
