@@ -29,12 +29,7 @@
                 <div class="card-body text-center">
 
                     <div class="form-row">
-                        <input
-                            id="access-key"
-                            class="input"
-                            type="password"
-                            placeholder="Access key"
-                        >
+                        <input id="access-key" class="input" type="password" placeholder="Access key">
                     </div>
 
                     <div class="session-buttons">
@@ -189,17 +184,35 @@
         function updateLapButtonsState(state) {
             const shouldEnable = state.raceStarted && !state.raceEnded; //buttons are active only when a race is ongoing
 
-            lapButtons.forEach((btn) => {
-                if (shouldEnable) {
+            // get only active cars from current session
+            let activeCars = [];
+
+            if (state.currentSession && state.currentSession.drivers) {
+                activeCars = state.currentSession.drivers.map(d => d.carNumber);
+            }
+
+            lapButtons.forEach((btn, index) => {
+
+                const carNumber = index + 1;
+                const isActiveCar = activeCars.includes(carNumber);
+
+                if (shouldEnable && isActiveCar) {
+
+                    // enable only session cars
                     btn.disabled = false;
                     btn.dataset.locked = "";
+
                 } else {
+
+                    // disable unused cars
                     btn.disabled = true;
                     btn.dataset.locked = "true";
                     btn.classList.remove("active");
+
                 }
             });
 
+            // message logic
             if (state.raceEnded) {
                 messageDiv.innerText = "Race finished. Waiting for session end.";
                 messageDiv.classList.add("placeholder");
