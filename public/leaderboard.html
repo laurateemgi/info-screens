@@ -67,6 +67,14 @@
                 renderLeaderboard(laps);
             });
 
+            // Convert milliseconds to seconds
+            function formatLapTime(ms) {
+                if (!ms) return "-";
+
+                const seconds = ms / 1000;
+                return seconds.toFixed(2) + " sec";
+            }
+
             // Function to render table rows
             function renderLeaderboard(laps) {
 
@@ -95,7 +103,7 @@
                     <td>${data.driverName || "-"}</td>
                     <td>${carNumber}</td>
                     <td>${data.lap}</td>
-                    <td>${data.fastest ? data.fastest : "-"}</td>
+                    <td>${formatLapTime(data.fastest)}</td>
                 `;
 
                     tbody.appendChild(tr);
