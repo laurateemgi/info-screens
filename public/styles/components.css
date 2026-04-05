@@ -383,7 +383,8 @@
 
 .driver-row {
     display: grid;
-    grid-template-columns: 78px minmax(0, 1fr) 44px; /* name can shrink properly inside grid */
+    grid-template-columns: 78px minmax(0, 1fr) 44px;
+    /* name can shrink properly inside grid */
     align-items: center;
     gap: 12px;
     background: #2e2e2e;
@@ -579,12 +580,12 @@
    RESPONSIVE: Phones / small screens
 ============================== */
 
-    #error-message {
-        font-size: 16px;
-        /* slightly smaller for mobile readability */
-        margin-top: 15px;
-        /* reduce vertical spacing */
-    }
+#error-message {
+    font-size: 16px;
+    /* slightly smaller for mobile readability */
+    margin-top: 15px;
+    /* reduce vertical spacing */
+}
 
 /* ==============================
    RESPONSIVE: Tablets
@@ -595,18 +596,70 @@
    LEADERBOARD
 ============================== */
 
+/* Leaderboard timer + flag alignment */
+.leaderboard-race-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Small flag box */
+.flag-box {
+    width: 65px;
+    height: 35px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+/* Minimalist Timer style */
+.leaderboard-mini-timer {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffcc00;
+    letter-spacing: 1px;
+    margin-top: 20px;
+}
+
+/* --- FLAG COLOR STATES (Crucial for JS) --- */
+
+.flag-box.flag-safe {
+    background-color: #28a745;
+}
+
+.flag-box.flag-hazard {
+    background-color: #f1c40f;
+}
+
+.flag-box.flag-danger {
+    background-color: #e31b23;
+}
+
+.flag-box.flag-finish {
+    background-image: repeating-conic-gradient(black 0% 25%, white 0% 50%);
+    background-size: 10px 10px;
+    border: 1px solid #fff;
+}
+
+
+
 /* Apply cups to first three rows (after thead) */
-.leaderboard-table tbody tr:nth-child(1) {
+.leaderboard-table tbody tr:nth-child(1):not(:has(.placeholder)) {
     border-left: 6px solid gold;
     /* 1st place */
 }
 
-.leaderboard-table tbody tr:nth-child(2) {
+.leaderboard-table tbody tr:nth-child(2):not(:has(.placeholder)) {
     border-left: 6px solid silver;
     /* 2nd place */
 }
 
-.leaderboard-table tbody tr:nth-child(3) {
+.leaderboard-table tbody tr:nth-child(3):not(:has(.placeholder)) {
     border-left: 6px solid #cd7f32;
     /* 3rd place (bronze) */
 }
@@ -626,6 +679,7 @@
     font-weight: 700;
     font-size: 18px;
 }
+
 
 
 /* ==============================
