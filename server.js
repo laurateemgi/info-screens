@@ -69,11 +69,6 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("requestState", () => {
-    if (!socket.isAuthorized && socket.role !== null) return;
-    socket.emit("stateUpdated", state);
-  });
-
   socket.on("requestLeaderboard", () => {
     socket.emit("leaderboardUpdated", state.laps);
   });
