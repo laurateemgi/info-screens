@@ -236,6 +236,67 @@ io.on("connection", (socket) => {
     io.emit("stateUpdated", state);
   });
 
+
+/* editDriver handler event */
+    socket.on("editDriver", ({ sessionId, oldName, newName }) => {
+        if (!socket.isAuthorized || socket.role !== "receptionist") return;
+
+        const session = state.sessions.find(s => s.id === sessionId);
+        if (!session) {
+            socket.emit("errorMessage", {
+            sessionId,
+            message: "Session not found"
+            });
+            return;
+        }
+
+        const driver = session.drivers.find(d => d.name === oldName);
+        if (!driver) {
+            socket.emit("errorMessage", {
+            sessionId,
+            message: "Driver not found"
+            });
+            return;
+        }
+
+        const trimmedName = newName.trim();
+
+        if (!trimmedName) {
+            socket.emit("errorMessage", {
+            sessionId,
+            message: "Driver name cannot be empty"
+            });
+            return;
+        }
+
+        if (trimmedName.length > MAX_NAME_LENGTH) {
+            socket.emit("errorMessage", {
+            sessionId,
+            message: `Driver name must be ${MAX_NAME_LENGTH} characters or less`
+            });
+            return;
+        }
+
+        const normalizedName = trimmedName.toLowerCase();
+
+        const nameExists = session.drivers.some(
+            d => d.name.trim().toLowerCase() === normalizedName && d.name !== oldName
+        );
+
+        if (nameExists) {
+            socket.emit("errorMessage", {
+            sessionId,
+            message: "Driver name already exists in this session"
+            });
+            return;
+        }
+
+        driver.name = trimmedName;
+
+        io.emit("sessionsUpdated", state.sessions);
+        });
+
+
   socket.on("setFlag", (mode) => { //1.2.3
 
     if (!socket.isAuthorized || socket.role !== "safety") return;

@@ -82,8 +82,8 @@
   <script>
     let currentSessions = [];
     let socket = null;
-    let MAX_DRIVERS = 8; //fallback values until server sends the real ones
-    let MAX_NAME_LENGTH = 20;
+    let MAX_DRIVERS = 8; //fallback value for front-end validation until server sends the real ones
+    let MAX_NAME_LENGTH = 20; //fallback value for front-end validation until server sends the real ones
     const authScreen = document.getElementById("auth-screen");
     const appScreen = document.getElementById("app-screen");
     const authError = document.getElementById("auth-error");
@@ -100,6 +100,8 @@
     /* CONNECTION between our login screen and real app */
     /* unlock() = authenticate user + open the app if valid + block if not*/
     function unlock() {
+        if (socket) return; //to prevent creating multiple sockets when clicking unlock too fast
+
         const key = document.getElementById("access-key").value.trim();
 
         if (!key) {
@@ -162,10 +164,6 @@
     //it sends an event to the server requesting a new race session
     function createSession() {
 
-      if (!confirm("Create a new empty session?")) {
-        return;
-      }
-
       socket.emit("createSession");
     }
 
@@ -203,6 +201,41 @@
       input.value = "";
       input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
     }
+
+    /* EDIT DRIVER */
+    function editDriver(sessionId, oldName) {
+        const newName = prompt("Edit driver name:", oldName);
+
+        if (newName === null) return;
+
+        const trimmedName = newName.trim();
+
+        if (!trimmedName) {
+        showTemporarySessionError(sessionId, "Driver name cannot be empty");
+        return;
+        }
+
+        if (trimmedName.length > MAX_NAME_LENGTH) {
+        showTemporarySessionError(
+            sessionId,
+            `Max ${MAX_NAME_LENGTH} characters allowed`
+        );
+        return;
+        }
+
+        if (trimmedName === oldName) {
+        return;
+        }
+
+        socket.emit("editDriver", {
+        sessionId,
+        oldName,
+        newName: trimmedName
+        });
+    }  
+
+
+
 
     /* PERSISTENT ERROR - for full session */
     function showPersistentSessionError(sessionId, message) {
@@ -242,6 +275,9 @@
 
     /* REMOVE DRIVER */
     function removeDriver(sessionId, driverName) {
+        if (!confirm("Do you wish to delete the driver?")) {
+            return;
+        }
 
       socket.emit("removeDriver", {
         sessionId,
@@ -253,7 +289,7 @@
 
     /* DELETE SESSION */
     function deleteSession(sessionId) {
-        if (!confirm("Delete this session?")) {
+        if (!confirm("Do you wish to delete the this session?")) {
             return;
         }
         socket.emit("deleteSession", sessionId);
@@ -314,16 +350,22 @@
             <ul>
                 ${session.drivers.map(d => `
                     <li class="driver-row">
-                      <span class="car-badge">
+                        <span class="car-badge">
                             CAR ${d.carNumber} </span>
 
                         <span class="driver-label">
                             ${d.name}
                         </span>
 
+                        <button
+                            class="edit-btn"
+                            onclick='editDriver(${JSON.stringify(session.id)}, ${JSON.stringify(d.name)})'>
+                            Edit
+                        </button>
+
                         <button 
                             class="remove-btn"
-                            onclick="removeDriver('${session.id}','${d.name}')">
+                            onclick='removeDriver(${JSON.stringify(session.id)}, ${JSON.stringify(d.name)})'>
                             X
                         </button>
                     </li>
@@ -337,7 +379,7 @@
                     class="input"
                     type="text"
                     placeholder="Enter driver name"
-                    maxlength="${MAX_NAME_LENGTH + 3}" 
+                    maxlength="${MAX_NAME_LENGTH + 1}" 
                     ${isFull ? "disabled" : ""}
                     oninput="validateDriverName('${session.id}')"
                     onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"

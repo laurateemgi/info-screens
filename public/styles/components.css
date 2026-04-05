@@ -383,10 +383,10 @@
 
 .driver-row {
     display: grid;
-    grid-template-columns: 78px minmax(0, 1fr) 44px;
+    grid-template-columns: 70px minmax(0, 1fr) 70px 44px;
     /* name can shrink properly inside grid */
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     background: #2e2e2e;
     padding: 12px 16px;
     border-radius: 10px;
@@ -403,8 +403,8 @@
 /* RESPONSIVE: shrink driver rows on mobile */
 @media (max-width: 600px) {
     .driver-row {
-        grid-template-columns: 70px minmax(0, 1fr) 44px;
-        gap: 10px;
+        grid-template-columns: 68px minmax(0, 1fr) 58px 44px;
+        gap: 8px;
         padding: 10px 12px;
         align-items: center;
     }
@@ -443,11 +443,11 @@
 .car-badge {
     text-align: center;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 11px;
     width: 100%;
     background: #ffcc00;
     color: black;
-    padding: 3px 5px;
+    padding: 3px 4px;
     border-radius: 6px;
     margin-right: 0px;
     box-sizing: border-box;
@@ -531,6 +531,7 @@
 .remove-btn {
     font-family: 'Orbitron', sans-serif;
     background: #e31b23;
+    opacity: 0.9;
     color: white;
     border: none;
     border-radius: 6px;
@@ -552,7 +553,45 @@
 }
 
 .remove-btn:hover {
-    background: #d9534f;
+    opacity: 1;
+}
+
+/* ==============================
+   EDIT BUTTON 
+============================== */
+.edit-btn {
+    font-family: 'Orbitron', sans-serif;
+    background: #5a5a5a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    width: 64px;
+    min-width: 64px;
+    max-width: 64px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+.edit-btn:hover {
+    background: #6f6f6f;
+}
+
+/* edit button phone */ 
+@media (max-width: 600px) {
+    .edit-btn {
+        width: 58px;
+        min-width: 58px;
+        max-width: 58px;
+        font-size: 11px;
+    }
 }
 
 #error-message {
