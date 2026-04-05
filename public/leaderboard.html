@@ -25,7 +25,6 @@
         </div>
 
         <!-- Grid layout for cards-->
-        <div class="page">
             <div class="grid">
                 <!-- Leaderboard card -->
                 <div class="card card-md card-center">
@@ -34,11 +33,17 @@
                             <table class="table leaderboard-table">
                                 <thead>
                                     <tr>
-                                        <th>Position</th>
+                                        <th>
+                                            <span class="leaderboard-desktop-label">Position</span>
+                                            <span class="leaderboard-mobile-label">Pos</span>
+                                        </th>
                                         <th>Driver</th>
                                         <th>Car</th>
                                         <th>Laps</th>
-                                        <th>Fastest Lap</th>
+                                        <th>
+                                            <span class="leaderboard-desktop-label">Fastest Lap</span>
+                                            <span class="leaderboard-mobile-label">Fastest</span>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="leaderboard-body">
@@ -51,7 +56,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         <!-- Socket.IO -->
         <script src="/socket.io/socket.io.js"></script>
@@ -155,9 +159,11 @@
                     const tr = document.createElement("tr");
 
 
-                    tr.innerHTML = `
-                    <td>${index + 1}</td> <!-- position -->
-                    <td>${data.driverName || "-"}</td>
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="leaderboard-driver-scroll">${data.driverName || "-"}</div>
+                    </td>
                     <td>${carNumber}</td>
                     <td>${data.lap}</td>
                     <td>${formatLapTime(data.fastest)}</td>
