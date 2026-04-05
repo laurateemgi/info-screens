@@ -59,3 +59,57 @@ socket.emit("authResult", { success })
 * Each page only accepts its **own role key**
 * Socket **connection** starts **after authentication**
 * UI is **blocked** until **login is successful**
+
+
+NEW PART:
+### Info Screens MVP
+## Setup
+
+# Install dependencies:
+
+npm install
+
+Create a .env file:
+
+RECEPTIONIST_KEY=yourkey
+SAFETY_KEY=yourkey
+OBSERVER_KEY=yourkey
+
+
+## Running the server
+Development mode (short timer)
+npm run dev
+
+Production mode (full timer)
+npm start
+or
+node server.js
+
+# Server runs on:
+
+http://localhost:3000
+
+
+## Roles
+
+# Receptionist
+Create/delete sessions
+Add/remove drivers
+
+# Safety
+Start race
+Change flags
+End session
+
+
+# Observer
+Record laps
+
+
+# Max 8 drivers per session
+# Driver names max 20 characters
+
+## Timer:
+
+Dev: 60 seconds
+Prod: 600 seconds

@@ -1,3 +1,7 @@
+////////////
+// CONFIG //
+////////////
+
 require("dotenv").config(); // 1.1 järgneb dotenv feature, mis enfoce'ib key'de olemasolu, kuigi ei tea,
 // 1.1 kas see järgnev panna peale const server = require socket.io-d või jääb siia ette. Imo siia ette, sest see check vb vaja esimesena teha.
 
@@ -10,15 +14,30 @@ if (
   process.exit(1);
 }
 
+/////////////
+// IMPORTS //
+/////////////
+
 // 1.1 copy-paste mix&match expressi + socketi kodukatelt, ehk siis serveri skeleton
 const express = require("express");
 //const { stat } = require("fs"); LAURA commenting it out before we delete - not needed for authentication
 const http = require("http");
 const { Server } = require("socket.io");
+// 13.1 constants
+const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants");
+
+
+//////////////////
+// Server setup //
+//////////////////
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+///////////////////////////
+// Middleware and routes //
+///////////////////////////
 
 app.use(express.static("public"));
 
@@ -30,8 +49,9 @@ server.listen(3000, () => {
   console.log("Server running on port 3000");
 });
 
-// 13.1 constants
-const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants");
+////////////////////////////////
+// Global state & global vars //
+////////////////////////////////
 
 // 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
@@ -53,6 +73,10 @@ function broadcastState() { //3.1 broadcastState, aga veel ei kasuta seda kuskil
 // 1.1 npm start ja npn run dev on package.jsonis olemas, aga need sõltuvad actual timer funktsioonist
 let sessionCounter = 1 //1.2 start session counting from 1 so we ensure every session has a unique ID
 let timerInterval = null; // 7.1 et timer jooksma ei jääks
+
+//////////////////////////////////
+// Socket connection and events //
+//////////////////////////////////
 
 // 1.1 socket.io ühendus
 io.on("connection", (socket) => {
@@ -317,6 +341,7 @@ io.on("connection", (socket) => {
     // Kui race on lõpetatud (finishRace() käivitatud),
     // siis lukustame race mode'i täielikult
 
+    if (!mode || typeof mode !== "string") return; //13.1 constants
     const newMode = mode.toUpperCase();                          //13,1 constants/ lubab kasutada valid modesid
     if (!Object.values(RACE_MODES).includes(newMode)) return;
     state.raceMode = newMode;
@@ -390,6 +415,9 @@ io.on("connection", (socket) => {
 // 1.2.3 functionid s.t. timer jne peavad olema io.on(connection)-st eraldi
 // 1.2.3 veel pole jõudnud functione teha
 
+//////////////////////
+// Helper functions //
+//////////////////////
 
 // 1.2 check for car numbers (must be consecutive even when some drivers are deleted)
 function getAvailableCarNumber(drivers) {
@@ -402,7 +430,6 @@ function getAvailableCarNumber(drivers) {
   }
   return null;
 }
-
 
 function startTimer() {
   const raceLength =      //7.1
