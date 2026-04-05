@@ -181,6 +181,26 @@
             }
         }
 
+        /* make sure stateUpdated is not sent too early, before this page starts listening for it */ 
+        socket.once("authResult", ({ success }) => {
+            if (!success) {
+                authError.textContent = "Incorrect access key";
+                socket.disconnect();
+                socket = null;
+                document.getElementById("access-key").focus();
+                return;
+            }
+
+            document.getElementById("access-key").value = "";
+            authScreen.style.display = "none";
+            appScreen.style.display = "block";
+            authError.textContent = "";
+
+            registerSocketListeners();
+            renderLapButtons();
+            socket.emit("requestState");
+        });
+
         function updateLapButtonsState(state) {
             const shouldEnable = state.raceStarted && !state.raceEnded; //buttons are active only when a race is ongoing
 

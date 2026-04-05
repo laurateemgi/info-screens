@@ -63,6 +63,11 @@ io.on("connection", (socket) => {
 
   socket.emit("stateUpdated", state);
 
+  socket.on("requestState", () => { //make sure server doesn't send stateUpdated too early
+    if (!socket.isAuthorized) return;
+    socket.emit("stateUpdated", state);
+  });
+
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
