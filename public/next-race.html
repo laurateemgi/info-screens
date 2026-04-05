@@ -27,7 +27,6 @@
 
 
         <!-- Grid layout -->
-        <div class="page">
             <div class="grid">
 
                 <!-- Next race card -->
@@ -36,12 +35,12 @@
                     <div class="card-body">
 
                         <!-- Table from components.css -->
-                        <table class="table">
+                        <table class="table next-race-table">
 
                             <thead>
                                 <tr>
-                                    <th>Driver</th>
-                                    <th>Car Number</th>
+                                    <th>Driver</th> <!--th = table header-->
+                                    <th>Car</th> 
                                 </tr>
                             </thead>
 
@@ -49,7 +48,7 @@
 
                                 <!-- Placeholder when empty -->
                                 <tr>
-                                    <td colspan="2" class="placeholder">
+                                    <td colspan="2" class="placeholder"> <!--td = table data cell-->
                                         No next race data yet
                                     </td>
                                 </tr>
@@ -109,7 +108,12 @@
                     const tr = document.createElement("tr");
 
                     const tdName = document.createElement("td");
-                    tdName.innerText = driver.name;
+
+                    const nameDiv = document.createElement("div");
+                    nameDiv.className = "driver-name-scroll";
+                    nameDiv.textContent = driver.name;
+
+                    tdName.appendChild(nameDiv);
                     tr.appendChild(tdName);
 
                     const tdCar = document.createElement("td");
