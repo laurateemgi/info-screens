@@ -13,7 +13,23 @@
 
 <body>
 
-    <header class="site-header"></header>
+    <header class="site-header">
+        <nav class="menu">
+            <div class="menu-item">
+                Menu ▾
+                <ul class="dropdown">
+                    <li><a href="/front-desk.html" target="_blank" rel="noopener noreferrer">Front Desk</a></li>
+                    <li><a href="/lap-line-tracker.html" target="_blank" rel="noopener noreferrer">Lap Line Tracker</a>
+                    </li>
+                    <li><a href="/leaderboard.html" target="_blank" rel="noopener noreferrer">Leaderboard</a></li>
+                    <li><a href="/next-race.html" target="_blank" rel="noopener noreferrer">Next Race</a></li>
+                    <li><a href="/race-control.html" target="_blank" rel="noopener noreferrer">Race Control</a></li>
+                    <li><a href="/race-countdown.html" target="_blank" rel="noopener noreferrer">Countdown</a></li>
+                    <li><a href="/race-flags.html" target="_blank" rel="noopener noreferrer">Flag Display</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
 
     <div class="page">
 
@@ -27,103 +43,103 @@
 
 
         <!-- Grid layout -->
-            <div class="grid">
+        <div class="grid">
 
-                <!-- Next race card -->
-                <div class="card card-md card-center">
+            <!-- Next race card -->
+            <div class="card card-md card-center">
 
-                    <div class="card-body">
+                <div class="card-body">
 
-                        <!-- Table from components.css -->
-                        <table class="table next-race-table">
+                    <!-- Table from components.css -->
+                    <table class="table next-race-table">
 
-                            <thead>
-                                <tr>
-                                    <th>Driver</th> <!--th = table header-->
-                                    <th>Car</th> 
-                                </tr>
-                            </thead>
+                        <thead>
+                            <tr>
+                                <th>Driver</th> <!--th = table header-->
+                                <th>Car</th>
+                            </tr>
+                        </thead>
 
-                            <tbody id="drivers-table">
+                        <tbody id="drivers-table">
 
-                                <!-- Placeholder when empty -->
-                                <tr>
-                                    <td colspan="2" class="placeholder"> <!--td = table data cell-->
-                                        No next race data yet
-                                    </td>
-                                </tr>
+                            <!-- Placeholder when empty -->
+                            <tr>
+                                <td colspan="2" class="placeholder"> <!--td = table data cell-->
+                                    No next race data yet
+                                </td>
+                            </tr>
 
-                            </tbody>
+                        </tbody>
 
-                        </table>
+                    </table>
 
-                    </div>
                 </div>
-
             </div>
+
         </div>
+    </div>
 
 
-        <!-- Socket.IO -->
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-            const socket = io();
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
 
-            socket.on("connect", () => {
-                console.log("Next Race screen connected");
+        socket.on("connect", () => {
+            console.log("Next Race screen connected");
+        });
+
+
+        // Listen for session updates
+        socket.on("sessionsUpdated", (sessions) => {
+            const tbody = document.getElementById("drivers-table");
+            tbody.innerHTML = ""; // clear previous rows
+
+            if (!sessions || sessions.length === 0) {
+                // No upcoming sessions
+                const tr = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = 2;
+                td.innerText = "No upcoming races";
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            // Show the first session only (next session)
+            const nextSession = sessions[0];
+
+            if (!nextSession.drivers || nextSession.drivers.length === 0) {
+                const tr = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = 2;
+                td.innerText = "No drivers in next session";
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            // Populate drivers
+            nextSession.drivers.forEach(driver => {
+                const tr = document.createElement("tr");
+
+                const tdName = document.createElement("td");
+
+                const nameDiv = document.createElement("div");
+                nameDiv.className = "driver-name-scroll";
+                nameDiv.textContent = driver.name;
+
+                tdName.appendChild(nameDiv);
+                tr.appendChild(tdName);
+
+                const tdCar = document.createElement("td");
+                tdCar.innerText = driver.carNumber;
+                tr.appendChild(tdCar);
+
+                tbody.appendChild(tr);
             });
-
-
-            // Listen for session updates
-            socket.on("sessionsUpdated", (sessions) => {
-                const tbody = document.getElementById("drivers-table");
-                tbody.innerHTML = ""; // clear previous rows
-
-                if (!sessions || sessions.length === 0) {
-                    // No upcoming sessions
-                    const tr = document.createElement("tr");
-                    const td = document.createElement("td");
-                    td.colSpan = 2;
-                    td.innerText = "No upcoming races";
-                    tr.appendChild(td);
-                    tbody.appendChild(tr);
-                    return;
-                }
-
-                // Show the first session only (next session)
-                const nextSession = sessions[0];
-
-                if (!nextSession.drivers || nextSession.drivers.length === 0) {
-                    const tr = document.createElement("tr");
-                    const td = document.createElement("td");
-                    td.colSpan = 2;
-                    td.innerText = "No drivers in next session";
-                    tr.appendChild(td);
-                    tbody.appendChild(tr);
-                    return;
-                }
-
-                // Populate drivers
-                nextSession.drivers.forEach(driver => {
-                    const tr = document.createElement("tr");
-
-                    const tdName = document.createElement("td");
-
-                    const nameDiv = document.createElement("div");
-                    nameDiv.className = "driver-name-scroll";
-                    nameDiv.textContent = driver.name;
-
-                    tdName.appendChild(nameDiv);
-                    tr.appendChild(tdName);
-
-                    const tdCar = document.createElement("td");
-                    tdCar.innerText = driver.carNumber;
-                    tr.appendChild(tdCar);
-
-                    tbody.appendChild(tr);
-                });
-            });
-        </script>
+        });
+    </script>
 
 </body>
 
