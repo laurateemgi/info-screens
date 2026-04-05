@@ -13,6 +13,21 @@
 <body>
 
     <header class="site-header">
+        <nav class="menu">
+            <div class="menu-item">
+                Menu ▾
+                <ul class="dropdown">
+                    <li><a href="/front-desk.html" target="_blank" rel="noopener noreferrer">Front Desk</a></li>
+                    <li><a href="/lap-line-tracker.html" target="_blank" rel="noopener noreferrer">Lap Line Tracker</a>
+                    </li>
+                    <li><a href="/leaderboard.html" target="_blank" rel="noopener noreferrer">Leaderboard</a></li>
+                    <li><a href="/next-race.html" target="_blank" rel="noopener noreferrer">Next Race</a></li>
+                    <li><a href="/race-control.html" target="_blank" rel="noopener noreferrer">Race Control</a></li>
+                    <li><a href="/race-countdown.html" target="_blank" rel="noopener noreferrer">Countdown</a></li>
+                    <li><a href="/race-flags.html" target="_blank" rel="noopener noreferrer">Flag Display</a></li>
+                </ul>
+            </div>
+        </nav>
     </header>
 
     <!-- Page content -->
@@ -25,37 +40,37 @@
         </div>
 
         <!-- Grid layout for cards-->
-            <div class="grid">
-                <!-- Leaderboard card -->
-                <div class="card card-md card-center">
-                    <div class="card-body">
-                        <div class="table-wrapper"> <!-- CHANGED: added wrapper for responsive scrolling -->
-                            <table class="table leaderboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <span class="leaderboard-desktop-label">Position</span>
-                                            <span class="leaderboard-mobile-label">Pos</span>
-                                        </th>
-                                        <th>Driver</th>
-                                        <th>Car</th>
-                                        <th>Laps</th>
-                                        <th>
-                                            <span class="leaderboard-desktop-label">Fastest Lap</span>
-                                            <span class="leaderboard-mobile-label">Fastest</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderboard-body">
-                                    <tr>
-                                        <td colspan="5" class="placeholder">No race data yet</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="grid">
+            <!-- Leaderboard card -->
+            <div class="card card-md card-center">
+                <div class="card-body">
+                    <div class="table-wrapper"> <!-- CHANGED: added wrapper for responsive scrolling -->
+                        <table class="table leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span class="leaderboard-desktop-label">Position</span>
+                                        <span class="leaderboard-mobile-label">Pos</span>
+                                    </th>
+                                    <th>Driver</th>
+                                    <th>Car</th>
+                                    <th>Laps</th>
+                                    <th>
+                                        <span class="leaderboard-desktop-label">Fastest Lap</span>
+                                        <span class="leaderboard-mobile-label">Fastest</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body">
+                                <tr>
+                                    <td colspan="5" class="placeholder">No race data yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
 
         <!-- Socket.IO -->
         <script src="/socket.io/socket.io.js"></script>
@@ -163,7 +178,7 @@
                     const tr = document.createElement("tr");
 
 
-                tr.innerHTML = `
+                    tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td>
                         <div class="leaderboard-driver-scroll">${data.driverName || "-"}</div>
