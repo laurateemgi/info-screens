@@ -201,6 +201,7 @@ body {
     border-radius: 8px;
     background: linear-gradient(145deg, #222, #111);
     transition: 0.2s;
+    color: #f1c40f;
 }
 
 .menu-item:hover {
@@ -295,7 +296,7 @@ body {
     }
 
     .site-header {
-        flex-direction: column;
+        /* flex-direction: column; */
         padding: 12px;
     }
 
