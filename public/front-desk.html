@@ -13,7 +13,23 @@
 <body>
 
   <!-- Header -->
-  <header class="site-header"></header>
+  <header class="site-header">
+    <nav class="menu">
+      <div class="menu-item">
+        Menu ▾
+        <ul class="dropdown">
+          <li><a href="/front-desk.html" target="_blank" rel="noopener noreferrer">Front Desk</a></li>
+          <li><a href="/lap-line-tracker.html" target="_blank" rel="noopener noreferrer">Lap Line Tracker</a>
+          </li>
+          <li><a href="/leaderboard.html" target="_blank" rel="noopener noreferrer">Leaderboard</a></li>
+          <li><a href="/next-race.html" target="_blank" rel="noopener noreferrer">Next Race</a></li>
+          <li><a href="/race-control.html" target="_blank" rel="noopener noreferrer">Race Control</a></li>
+          <li><a href="/race-countdown.html" target="_blank" rel="noopener noreferrer">Countdown</a></li>
+          <li><a href="/race-flags.html" target="_blank" rel="noopener noreferrer">Flag Display</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
 
   <!-- AUTH SCREEN -->
   <div id="auth-screen" class="page">
@@ -27,12 +43,7 @@
           </div>
 
           <div class="form-row">
-            <input
-              id="access-key"
-              class="input"
-              type="password"
-              placeholder="Access key"
-            >
+            <input id="access-key" class="input" type="password" placeholder="Access key">
           </div>
 
           <div class="session-buttons">
@@ -51,159 +62,160 @@
   <!-- APP SCREEN -->
   <div id="app-screen" style="display: none;">
 
-  <!-- Page container -->
-  <div class="page">
+    <!-- Page container -->
+    <div class="page">
 
-    <!-- Page title -->
-    <div class="page-header">
-      <div class="page-title">Racetrack Reception</div>
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="page-title">Racetrack Reception</div>
+      </div>
+
+
+
+      <!-- MUUDETUD! New session button connected to components -->
+      <div class="session-buttons">
+        <button class="btn btn-primary" onclick="createSession()">
+          + New Session
+        </button>
+      </div>
+
+
+      <!-- Session cards rendered by Socket.IO -->
+      <div id="sessions" class="grid"></div>
+
     </div>
 
 
-
-    <!-- MUUDETUD! New session button connected to components -->
-    <div class="session-buttons">
-      <button class="btn btn-primary" onclick="createSession()">
-        + New Session
-      </button>
-    </div>
+    <!-- server connection -->
+    <script src="/socket.io/socket.io.js"></script>
 
 
-    <!-- Session cards rendered by Socket.IO -->
-    <div id="sessions" class="grid"></div>
+    <script>
+      let currentSessions = [];
+      let socket = null;
+      let MAX_DRIVERS = 8; //fallback value for front-end validation until server sends the real ones
+      let MAX_NAME_LENGTH = 20; //fallback value for front-end validation until server sends the real ones
+      const authScreen = document.getElementById("auth-screen");
+      const appScreen = document.getElementById("app-screen");
+      const authError = document.getElementById("auth-error");
 
-  </div>
+      const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
+      /// deleting now as we need front end errors first   const errorDiv = document.getElementById("error-message"); //show error messages in error div
+      let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
 
-
-  <!-- server connection -->
-  <script src="/socket.io/socket.io.js"></script>
-
-
-  <script>
-    let currentSessions = [];
-    let socket = null;
-    let MAX_DRIVERS = 8; //fallback value for front-end validation until server sends the real ones
-    let MAX_NAME_LENGTH = 20; //fallback value for front-end validation until server sends the real ones
-    const authScreen = document.getElementById("auth-screen");
-    const appScreen = document.getElementById("app-screen");
-    const authError = document.getElementById("auth-error");
-
-    const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
-/// deleting now as we need front end errors first   const errorDiv = document.getElementById("error-message"); //show error messages in error div
-    let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
-
-    const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
-        accessInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") { unlock();}});    
+      const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
+      accessInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") { unlock(); }
+      });
 
 
-    /* CONNECTION between our login screen and real app */
-    /* unlock() = authenticate user + open the app if valid + block if not*/
-    function unlock() {
+      /* CONNECTION between our login screen and real app */
+      /* unlock() = authenticate user + open the app if valid + block if not*/
+      function unlock() {
         if (socket) return; //to prevent creating multiple sockets when clicking unlock too fast
 
         const key = document.getElementById("access-key").value.trim();
 
         if (!key) {
-            authError.textContent = "Access key is required";
-            return;
+          authError.textContent = "Access key is required";
+          return;
         }
 
         socket = io(); //after clicking Unlock, the connection is built
 
         //AUTHENTICATION 
         socket.once("authResult", ({ success }) => { //listen for auth result from server ONCE per login attempt
-            if (!success) { //FAILED AUTH
-                authError.textContent = "Incorrect access key";
-                socket.disconnect();
-                socket = null; //reset socket variable
-                document.getElementById("access-key").focus(); //focus input so user can retry quickly
-                return;
-            }
-            //if auth is SUCCESSFUL
-            document.getElementById("access-key").value = ""; //clear input field (security + clean UI)
-            authScreen.style.display = "none"; //hide login screen
-            appScreen.style.display = "block"; 
-            authError.textContent = "";
+          if (!success) { //FAILED AUTH
+            authError.textContent = "Incorrect access key";
+            socket.disconnect();
+            socket = null; //reset socket variable
+            document.getElementById("access-key").focus(); //focus input so user can retry quickly
+            return;
+          }
+          //if auth is SUCCESSFUL
+          document.getElementById("access-key").value = ""; //clear input field (security + clean UI)
+          authScreen.style.display = "none"; //hide login screen
+          appScreen.style.display = "block";
+          authError.textContent = "";
 
-            registerSocketListeners();
+          registerSocketListeners();
 
         });
 
         socket.emit("verifyKey", {
-            role: "receptionist", //defines which role can log in
-            key
+          role: "receptionist", //defines which role can log in
+          key
         });
-        }
+      }
 
-    /* SOCKET LISTNERS - so they would be only attached after login (prevents duplicate listeners, invalid sttate updates, memory issues) */
-    function registerSocketListeners() {
+      /* SOCKET LISTNERS - so they would be only attached after login (prevents duplicate listeners, invalid sttate updates, memory issues) */
+      function registerSocketListeners() {
 
         socket.on("initConstants", (constants) => {
-            MAX_DRIVERS = constants.MAX_DRIVERS;
-            MAX_NAME_LENGTH = constants.MAX_NAME_LENGTH;
-            });
+          MAX_DRIVERS = constants.MAX_DRIVERS;
+          MAX_NAME_LENGTH = constants.MAX_NAME_LENGTH;
+        });
 
         socket.on("errorMessage", ({ sessionId, message }) => { //user gets feedback from frontend (socket.ON)
-            if (!sessionId) return;
-            showTemporarySessionError(sessionId, message);
+          if (!sessionId) return;
+          showTemporarySessionError(sessionId, message);
         });
 
         socket.on("sessionsUpdated", (sessions) => {
-            renderSessions(sessions);
+          renderSessions(sessions);
         });
 
         socket.on("stateUpdated", (state) => {
-            renderSessions(state.sessions);
+          renderSessions(state.sessions);
         });
+      }
+
+
+
+      //function triggered when the "Create Session" button is pressed
+      //it sends an event to the server requesting a new race session
+      function createSession() {
+
+        socket.emit("createSession");
+      }
+
+
+      /* ADD DRIVER */
+      function addDriver(sessionId) {
+        console.log("addDriver clicked", sessionId); //TEMPORARY, delete later
+
+        const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
+
+        if (input.disabled) {
+          showTemporarySessionError(sessionId, `Session is full - max ${MAX_DRIVERS} drivers`);
+          return;
         }
 
+        const name = input.value.trim();
 
+        if (!name) {
+          showTemporarySessionError(sessionId, "Driver name cannot be empty");
+          return;
+        }
 
-    //function triggered when the "Create Session" button is pressed
-    //it sends an event to the server requesting a new race session
-    function createSession() {
+        if (name.length > MAX_NAME_LENGTH) {
+          showTemporarySessionError(sessionId, `Max ${MAX_NAME_LENGTH} characters allowed`);
+          return;
+        }
 
-      socket.emit("createSession");
-    }
+        lastActiveSessionInput = sessionId;
 
+        socket.emit("addDriver", { //send event to server with session ID and driver names
+          sessionId,
+          driverName: name
+        });
 
-    /* ADD DRIVER */
-    function addDriver(sessionId) {
-    console.log("addDriver clicked", sessionId); //TEMPORARY, delete later
-
-      const input = document.getElementById(`driver-input-${sessionId}`); //ask receptionist to enter drivers' names
-   
-     if (input.disabled) {
-        showTemporarySessionError(sessionId, `Session is full - max ${MAX_DRIVERS} drivers`);
-        return;
-     }
-
-      const name = input.value.trim();
-
-      if (!name) {
-        showTemporarySessionError(sessionId,"Driver name cannot be empty");
-        return;
+        input.value = "";
+        input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
       }
 
-      if (name.length > MAX_NAME_LENGTH) {
-        showTemporarySessionError(sessionId, `Max ${MAX_NAME_LENGTH} characters allowed`);        
-        return;
-      }
-
-      lastActiveSessionInput = sessionId;
-
-      socket.emit("addDriver", { //send event to server with session ID and driver names
-        sessionId,
-        driverName: name
-      });
-
-      input.value = "";
-      input.focus(); //after adding a driver, focus the input again so the receptionist can quickly add multiple drivers
-    }
-
-    /* EDIT DRIVER */
-    function editDriver(sessionId, oldName) {
+      /* EDIT DRIVER */
+      function editDriver(sessionId, oldName) {
         const newName = prompt("Edit driver name:", oldName);
 
         if (newName === null) return;
@@ -211,43 +223,43 @@
         const trimmedName = newName.trim();
 
         if (!trimmedName) {
-        showTemporarySessionError(sessionId, "Driver name cannot be empty");
-        return;
+          showTemporarySessionError(sessionId, "Driver name cannot be empty");
+          return;
         }
 
         if (trimmedName.length > MAX_NAME_LENGTH) {
-        showTemporarySessionError(
+          showTemporarySessionError(
             sessionId,
             `Max ${MAX_NAME_LENGTH} characters allowed`
-        );
-        return;
+          );
+          return;
         }
 
         if (trimmedName === oldName) {
-        return;
+          return;
         }
 
         socket.emit("editDriver", {
-        sessionId,
-        oldName,
-        newName: trimmedName
+          sessionId,
+          oldName,
+          newName: trimmedName
         });
-    }  
+      }
 
 
 
 
-    /* PERSISTENT ERROR - for full session */
-    function showPersistentSessionError(sessionId, message) {
+      /* PERSISTENT ERROR - for full session */
+      function showPersistentSessionError(sessionId, message) {
         const el = document.getElementById(`session-error-${sessionId}`);
         if (!el) return;
 
         el.textContent = message;
         el.style.opacity = "1";
-    }
+      }
 
-    /* SHOW TEMPORARY ERROR MESSAGE AFTER BUTTONS */
-    function showTemporarySessionError(sessionId, message) {
+      /* SHOW TEMPORARY ERROR MESSAGE AFTER BUTTONS */
+      function showTemporarySessionError(sessionId, message) {
         const errorEl = document.getElementById(`session-error-${sessionId}`);
         if (!errorEl) return;
 
@@ -257,94 +269,94 @@
         clearTimeout(errorEl.hideTimeout);
 
         errorEl.hideTimeout = setTimeout(() => {
-            errorEl.style.opacity = "0";
-            errorEl.textContent = "";
+          errorEl.style.opacity = "0";
+          errorEl.textContent = "";
         }, 2500);
-        }
-    
-    /* CLEAR SESSION MESSAGE */
-    function clearSessionError(sessionId) {
-    const errorEl = document.getElementById(`session-error-${sessionId}`);
-    if (!errorEl) return;
+      }
 
-    clearTimeout(errorEl.hideTimeout);
-    errorEl.textContent = "";
-    errorEl.style.opacity = "0";
-    }
+      /* CLEAR SESSION MESSAGE */
+      function clearSessionError(sessionId) {
+        const errorEl = document.getElementById(`session-error-${sessionId}`);
+        if (!errorEl) return;
+
+        clearTimeout(errorEl.hideTimeout);
+        errorEl.textContent = "";
+        errorEl.style.opacity = "0";
+      }
 
 
-    /* REMOVE DRIVER */
-    function removeDriver(sessionId, driverName) {
+      /* REMOVE DRIVER */
+      function removeDriver(sessionId, driverName) {
         if (!confirm("Do you wish to delete the driver?")) {
-            return;
+          return;
         }
 
-      socket.emit("removeDriver", {
-        sessionId,
-        driverName
-      });
-    }
+        socket.emit("removeDriver", {
+          sessionId,
+          driverName
+        });
+      }
 
 
 
-    /* DELETE SESSION */
-    function deleteSession(sessionId) {
+      /* DELETE SESSION */
+      function deleteSession(sessionId) {
         if (!confirm("Do you wish to delete the this session?")) {
-            return;
+          return;
         }
         socket.emit("deleteSession", sessionId);
-     }
+      }
 
-    /* SHOW DRIVER NAME LENGTH ERROR INSTANTLY */
-    function validateDriverName(sessionId) {
+      /* SHOW DRIVER NAME LENGTH ERROR INSTANTLY */
+      function validateDriverName(sessionId) {
         const input = document.getElementById(`driver-input-${sessionId}`);
         if (!input) return;
 
         const name = input.value;
 
         if (name.length > MAX_NAME_LENGTH) {
-            showTemporarySessionError(
+          showTemporarySessionError(
             sessionId,
             `Max ${MAX_NAME_LENGTH} characters allowed`
-            );
+          );
         } else {
-            // only clear if not full-session error
-            const session = getSessionById(sessionId);
-            if (session && session.drivers.length < MAX_DRIVERS) {
+          // only clear if not full-session error
+          const session = getSessionById(sessionId);
+          if (session && session.drivers.length < MAX_DRIVERS) {
             clearSessionError(sessionId);
-            }
+          }
         }
-     }
+      }
 
-    /* HELPER TO ACCESS SESSION */
-    function getSessionById(sessionId) {
-    return currentSessions.find(session => session.id === sessionId);
-    }
+      /* HELPER TO ACCESS SESSION */
+      function getSessionById(sessionId) {
+        return currentSessions.find(session => session.id === sessionId);
+      }
 
 
-    //listen for updates from the server when session data changes
-    //server sends the updated sessions list
-    function renderSessions (sessions) {
+      //listen for updates from the server when session data changes
+      //server sends the updated sessions list
+      function renderSessions(sessions) {
         currentSessions = sessions;
         sessionsDiv.innerHTML = ""; //if update then clear the current session display
 
         sessions.forEach(session => {
-        const div = document.createElement("div");
-        // MUUDETUD! Connected to components by using session-card
-        div.className = "session-card card card-lg";
+          const div = document.createElement("div");
+          // MUUDETUD! Connected to components by using session-card
+          div.className = "session-card card card-lg";
 
-        const isFull = session.drivers.length >= MAX_DRIVERS;
+          const isFull = session.drivers.length >= MAX_DRIVERS;
 
-        const addButtonHtml = `
+          const addButtonHtml = `
         <button
             type="button"
             class="btn btn-primary ${isFull ? 'btn-disabled' : ''}"
             onclick="addDriver('${session.id}')">
             Add Driver
         </button>
-        `;      
+        `;
 
-        div.innerHTML = `
+          div.innerHTML = `
             <h3>${session.id}</h3>
 
             <ul>
@@ -397,29 +409,29 @@
             <div id="session-error-${session.id}" class="session-inline-error"></div>
         `;
 
-        sessionsDiv.appendChild(div); //1.2 add the completed session element to the page
-            if (isFull) {
+          sessionsDiv.appendChild(div); //1.2 add the completed session element to the page
+          if (isFull) {
             setTimeout(() => {
-                showPersistentSessionError(
+              showPersistentSessionError(
                 session.id,
                 `Session is full - max ${MAX_DRIVERS} drivers`
-                );
+              );
             }, 0);
-            } else {
+          } else {
             clearSessionError(session.id);
-            }
-      });
+          }
+        });
 
 
-      if (lastActiveSessionInput) { //restore focus after rendering
-        const input = document.getElementById(`driver-input-${lastActiveSessionInput}`);
-        if (input) {
-          input.focus();
+        if (lastActiveSessionInput) { //restore focus after rendering
+          const input = document.getElementById(`driver-input-${lastActiveSessionInput}`);
+          if (input) {
+            input.focus();
+          }
         }
-      }
-    };
+      };
 
-  </script>
+    </script>
 
   </div>
 
