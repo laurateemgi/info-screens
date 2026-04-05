@@ -68,9 +68,20 @@ io.on("connection", (socket) => {
     socket.emit("stateUpdated", state);
   });
 
+
+  socket.on("requestState", () => {
+    if (!socket.isAuthorized && socket.role !== null) return;
+    socket.emit("stateUpdated", state);
+  });
+
+  socket.on("requestLeaderboard", () => {
+    socket.emit("leaderboardUpdated", state.laps);
+  });
+
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
+
   // 1.2.1 leidsin selle socket event template'i otsides & võiks vajalik olla imo:
   socket.on('error', (err) => {
     console.error(`Socket error from ${socket.id}:`, err);

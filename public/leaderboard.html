@@ -127,6 +127,10 @@
                 renderLeaderboard(laps);
             });
 
+            // Show data after refresh
+            socket.emit("requestState");
+            socket.emit("requestLeaderboard");
+
             // Convert milliseconds to seconds
             function formatLapTime(ms) {
                 if (!ms) return "-";
@@ -185,6 +189,7 @@
                     tbody.appendChild(tr);
                 }
             }
+
         </script>
 
 </body>
