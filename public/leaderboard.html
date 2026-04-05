@@ -18,8 +18,10 @@
     <!-- Page content -->
     <div class="page">
 
-        <div class="page-header">
+        <div class="page-header leaderboard-header-flex">
             <div class="page-title">Leaderboard</div>
+            <div id="leaderboard-timer" class="leaderboard-mini-timer">10:00</div>
+            <div id="leaderboard-flag" class="flag-box"></div>
         </div>
 
         <!-- Grid layout for cards-->
@@ -58,9 +60,63 @@
             // Connect to server
             const socket = io();
 
+            const timerEl = document.getElementById("leaderboard-timer");
+            const flagEl = document.getElementById("leaderboard-flag");
+
             socket.on("connect", () => {
                 console.log("Leaderboard connected");
             });
+
+            // Function to format seconds into MM:SS
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+            }
+
+            // Function to update the small flag box class
+            function updateLeaderboardFlag(mode) {
+                if (!flagEl) return;
+
+                // Remove old classes
+                flagEl.classList.remove("flag-safe", "flag-hazard", "flag-danger", "flag-finish");
+
+                const m = (mode || "DANGER").toUpperCase();
+
+                if (m === "SAFE") {
+                    flagEl.classList.add("flag-safe");
+                } else if (m === "HAZARD") {
+                    flagEl.classList.add("flag-hazard");
+                } else if (m === "FINISH") {
+                    flagEl.classList.add("flag-finish");
+                } else {
+                    flagEl.classList.add("flag-danger");
+                }
+            }
+
+            // 1. Listen for per-second timer updates
+            socket.on("timerUpdated", (time) => {
+                if (timerEl) timerEl.textContent = formatTime(time);
+            });
+
+            // 2. Listen for full state updates (on refresh or change)
+            socket.on("stateUpdated", (state) => {
+                if (state) {
+                    if (typeof state.timer === "number") {
+                        timerEl.textContent = formatTime(state.timer);
+                    }
+                    if (state.raceMode) {
+                        updateLeaderboardFlag(state.raceMode);
+                    }
+                }
+            });
+
+            // 3. Listen for immediate flag changes
+            socket.on("flagChanged", (mode) => {
+                updateLeaderboardFlag(mode);
+            });
+
+
 
             // Listen for leaderboard updates from server
             socket.on("leaderboardUpdated", (laps) => {
@@ -84,7 +140,7 @@
                 tbody.innerHTML = "";
 
                 // Convert object → array so we can loop & sort
-                let cars = Object.entries(laps);
+                let cars = Object.entries(laps).filter(([num, data]) => data.fastest > 0);
 
                 // Sort by fastest lap (smallest time first)
                 cars.sort((a, b) => {
@@ -97,6 +153,7 @@
                 cars.forEach(([carNumber, data], index) => {
 
                     const tr = document.createElement("tr");
+
 
                     tr.innerHTML = `
                     <td>${index + 1}</td> <!-- position -->
@@ -113,8 +170,11 @@
                 if (cars.length === 0) {
                     const tr = document.createElement("tr");
                     const td = document.createElement("td");
+
                     td.colSpan = 5;
+                    td.className = "placeholder";
                     td.innerText = "No race data yet";
+
                     tr.appendChild(td);
                     tbody.appendChild(tr);
                 }
