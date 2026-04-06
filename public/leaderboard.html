@@ -163,12 +163,16 @@
                 tbody.innerHTML = "";
 
                 // Convert object → array so we can loop & sort
-                let cars = Object.entries(laps).filter(([num, data]) => data.fastest > 0);
+                // let cars = Object.entries(laps).filter(([num, data]) => data.fastest > 0);
+                const cars = Object.entries(laps); //selleks, et leaderboard näitaks ka autosid, kellel pole veel kiiret ringi, muidu on alguses tühi ja tekib alles siis, kui keegi lõpetab ringi.
+
 
                 // Sort by fastest lap (smallest time first)
                 cars.sort((a, b) => {
                     const aFast = a[1].fastest || Infinity;
                     const bFast = b[1].fastest || Infinity;
+                    const aFast = a[1].fastest > 0 ? a[1].fastest : Infinity;
+                    const bFast = b[1].fastest > 0 ? b[1].fastest : Infinity;
                     return aFast - bFast;
                 });
 
