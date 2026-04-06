@@ -275,6 +275,7 @@
         width: 100%;
         min-width: 0;
     }
+
     .leaderboard-table th {
         font-size: 12px;
         padding: 8px 4px;
@@ -321,6 +322,7 @@
 }
 
 @media (max-width: 600px) {
+
     .next-race-table th,
     .next-race-table td {
         padding: 10px 8px;
@@ -341,6 +343,7 @@
         font-size: 14px;
     }
 }
+
 /* ==============================
    FLAGS
 ============================== */
@@ -696,7 +699,7 @@
     background: #6f6f6f;
 }
 
-/* edit button phone */ 
+/* edit button phone */
 @media (max-width: 600px) {
     .edit-btn {
         width: 58px;
@@ -708,13 +711,13 @@
 
 @media (max-width: 600px) {
     #error-message {
-    text-align: center;
-    /* centers text horizontally */
-    color: white;
-    font-weight: 600;
-    margin-top: 20px;
-    /* spacing below title */
-    font-size: 18px;
+        text-align: center;
+        /* centers text horizontally */
+        color: white;
+        font-weight: 600;
+        margin-top: 20px;
+        /* spacing below title */
+        font-size: 18px;
     }
 }
 
@@ -933,7 +936,6 @@
     max-width: 600px;
     margin: 25px auto 0;
     align-items: center;
-    min-width: 390px;
 }
 
 /* ==============================
@@ -979,9 +981,14 @@
 
     .controls-wrapper {
         width: 100%;
-        min-width: auto;
-
+        min-width: 0;
+        max-width: 100%;
         justify-content: center;
+    }
+
+    /* see aitab, et nuppude blokk kasutaks kogu laiust mobiilil, mitte ei jääks keskele väikesele alale */
+    .controls-wrapper .card {
+        width: 100%;
     }
 
     .controls-grid {
@@ -989,6 +996,7 @@
         /* buttons stacked */
         width: 100%;
         gap: 10px;
+        align-items: stretch;
     }
 
     .controls-grid .btn {
@@ -997,6 +1005,7 @@
         min-width: 0;
         padding: 14px;
         font-size: 14px;
+        flex: 1 1 auto;
     }
 
     .race-info-text {
