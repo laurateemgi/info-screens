@@ -169,8 +169,6 @@
 
                 // Sort by fastest lap (smallest time first)
                 cars.sort((a, b) => {
-                    const aFast = a[1].fastest || Infinity;
-                    const bFast = b[1].fastest || Infinity;
                     const aFast = a[1].fastest > 0 ? a[1].fastest : Infinity;
                     const bFast = b[1].fastest > 0 ? b[1].fastest : Infinity;
                     return aFast - bFast;
