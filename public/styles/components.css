@@ -441,6 +441,27 @@
 }
 
 /* ==============================
+   RESPONSIVE: MOBILE
+============================== */
+@media (max-width: 600px) {
+    .countdown-container {
+        width: 100%;
+        padding: 0 12px;
+        box-sizing: border-box;
+    }
+
+    .race-countdown {
+        font-size: clamp(56px, 18vw, 120px);
+        font-weight: 700;
+        color: #ffcc00;
+        text-align: center;
+        letter-spacing: 2px;
+        line-height: 1;
+        margin: 0;
+    }
+}
+
+/* ==============================
    FRONT-DESK SESSION CARDS
 ============================== */
 #sessions {
@@ -989,23 +1010,30 @@
     /* see aitab, et nuppude blokk kasutaks kogu laiust mobiilil, mitte ei jääks keskele väikesele alale */
     .controls-wrapper .card {
         width: 100%;
+        box-sizing: border-box;
     }
 
     .controls-grid {
+        display: flex;
         flex-direction: column;
         /* buttons stacked */
         width: 100%;
         gap: 10px;
-        align-items: stretch;
+        align-items: center;
+        /* stretch asemel center */
+        box-sizing: border-box;
     }
 
     .controls-grid .btn {
+        display: block;
         width: 100%;
         /* full width buttons */
         min-width: 0;
         padding: 14px;
         font-size: 14px;
-        flex: 1 1 auto;
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        margin: 0;
     }
 
     .race-info-text {
