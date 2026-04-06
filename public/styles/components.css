@@ -161,12 +161,12 @@
 
 .next-race-table th:first-child,
 .next-race-table td:first-child {
-    width: 78%;
+    width: 60%;
 }
 
 .next-race-table th:last-child,
 .next-race-table td:last-child {
-    width: 22%;
+    width: 40%;
     text-align: center;
     white-space: nowrap;
 }
@@ -1041,4 +1041,37 @@
         font-size: 14px;
         padding-top: 6px;
     }
+}
+
+/* ==============================
+   Next race: paddock notification
+============================== */
+
+
+.paddock-alert {
+    background: linear-gradient(135deg, #1a1a1a, #333);
+    border: 3px solid gold;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    animation: pulse-border 2s infinite;
+}
+
+
+.paddock-text {
+    text-align: left;
+    color: white;
+}
+
+
+.paddock-text strong {
+    font-size: 22px;
+    color: gold;
+    display: block;
+    margin-bottom: 5px;
 }
