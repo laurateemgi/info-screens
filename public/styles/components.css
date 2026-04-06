@@ -651,13 +651,14 @@
 }
 
 /* Use existing global button style */
-.driver-form .btn,
 .session-buttons .btn {
+    width: auto;
+    /* center access key button */
+    padding: 12px 28px;
+}
+
+.driver-form .btn {
     width: 100%;
-    height: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 
