@@ -79,11 +79,12 @@
         </button>
       </div>
 
+    
 
       <!-- Session cards rendered by Socket.IO -->
       <div id="sessions" class="grid"></div>
 
-    </div>
+    </div> <!-- end of app-screen-->
 
 
     <!-- server connection -->
@@ -100,7 +101,6 @@
       const authError = document.getElementById("auth-error");
 
       const sessionsDiv = document.getElementById("sessions"); //reference to the HTML container where sessions will be displayed
-      /// deleting now as we need front end errors first   const errorDiv = document.getElementById("error-message"); //show error messages in error div
       let lastActiveSessionInput = null; //to get focus on the last field that was used before sending the message to server
 
       const accessInput = document.getElementById("access-key"); //authenticate with clicking Enter
@@ -118,9 +118,11 @@
 
         if (!key) {
           authError.textContent = "Access key is required";
+          accessInput.focus();
           return;
         }
 
+        authError.textContent = "";
         socket = io(); //after clicking Unlock, the connection is built
 
         //AUTHENTICATION 
@@ -129,17 +131,18 @@
             authError.textContent = "Incorrect access key";
             socket.disconnect();
             socket = null; //reset socket variable
-            document.getElementById("access-key").focus(); //focus input so user can retry quickly
+            accessInput.focus();
             return;
           }
+          
+          accessInput.value = ""; //clear input field (security + clean UI)
           //if auth is SUCCESSFUL
-          document.getElementById("access-key").value = ""; //clear input field (security + clean UI)
           authScreen.style.display = "none"; //hide login screen
           appScreen.style.display = "block";
           authError.textContent = "";
 
           registerSocketListeners();
-
+          socket.emit("requestState");
         });
 
         socket.emit("verifyKey", {
@@ -167,6 +170,10 @@
 
         socket.on("stateUpdated", (state) => {
           renderSessions(state.sessions);
+        });
+
+        socket.on("disconnect", () => { //reset socket on failure and disconnect
+            socket = null;
         });
       }
 
@@ -315,7 +322,9 @@
         const name = input.value;
 
         if (name.length > MAX_NAME_LENGTH) {
-          showTemporarySessionError(
+        input.value = name.slice(0, MAX_NAME_LENGTH);
+
+        showTemporarySessionError(
             sessionId,
             `Max ${MAX_NAME_LENGTH} characters allowed`
           );
@@ -391,7 +400,6 @@
                     class="input"
                     type="text"
                     placeholder="Enter driver name"
-                    maxlength="${MAX_NAME_LENGTH + 1}" 
                     ${isFull ? "disabled" : ""}
                     oninput="validateDriverName('${session.id}')"
                     onkeydown="if(event.key === 'Enter') addDriver('${session.id}')"
@@ -432,8 +440,6 @@
       };
 
     </script>
-
-  </div>
 
 </body>
 
