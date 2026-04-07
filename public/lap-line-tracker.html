@@ -103,6 +103,7 @@
         const messageDiv = document.getElementById("message");
 
         let lapButtons = [];
+        let MAX_DRIVERS = 8;  //15.1 constants
 
         accessKeyInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
@@ -115,6 +116,10 @@
             socket.on("connect", () => {
                 console.log("Connected to server");
             });
+
+            socket.on("initConstants", (constants) => {   //15.1 constants
+                MAX_DRIVERS = constants.MAX_DRIVERS;       //15.1
+            });                                             //15.1
 
             socket.on("stateUpdated", (state) => {
                 updateLapButtonsState(state);
@@ -136,7 +141,7 @@
             lapButtonsDiv.innerHTML = "";
             lapButtons = [];
 
-            for (let i = 1; i <= 8; i++) {
+            for (let i = 1; i <= MAX_DRIVERS; i++) {   //15.1 constants: 8 to MAX_DRIVERS
                 const btn = document.createElement("button");
                 btn.className = "btn";
                 btn.innerText = "CAR " + i;

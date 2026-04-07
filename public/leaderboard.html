@@ -82,6 +82,8 @@
             const timerEl = document.getElementById("leaderboard-timer");
             const flagEl = document.getElementById("leaderboard-flag");
 
+            let RACE_MODES = {};    //15.1 constants
+
             socket.on("connect", () => {
                 console.log("Leaderboard connected");
             });
@@ -101,12 +103,16 @@
                 flagEl.classList.remove("flag-safe", "flag-hazard", "flag-danger", "flag-finish");
 
                 const m = (mode || "DANGER").toUpperCase();
+                const safe = (RACE_MODES.SAFE || "SAFE");       //15.1 constants
+                const hazard = (RACE_MODES.HAZARD || "HAZARD"); //15.1
+                const finish = (RACE_MODES.FINISH || "FINISH"); //15.1
 
-                if (m === "SAFE") {
+
+                if (m === safe) {                           //15.1 "SAFE" to safe
                     flagEl.classList.add("flag-safe");
-                } else if (m === "HAZARD") {
+                } else if (m === hazard) {                  //15.1
                     flagEl.classList.add("flag-hazard");
-                } else if (m === "FINISH") {
+                } else if (m === finish) {                  //15.1
                     flagEl.classList.add("flag-finish");
                 } else {
                     flagEl.classList.add("flag-danger");
@@ -117,6 +123,10 @@
             socket.on("timerUpdated", (time) => {
                 if (timerEl) timerEl.textContent = formatTime(time);
             });
+
+            socket.on("initConstants", (constants) => {     //15.1 constants
+                RACE_MODES = constants.RACE_MODES;          //
+            });                                             //
 
             // 2. Listen for full state updates (on refresh or change)
             socket.on("stateUpdated", (state) => {

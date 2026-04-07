@@ -26,6 +26,8 @@
         const body = document.body;
         const flagText = document.getElementById("flag-text");
 
+        let RACE_MODES = {};
+
         // Function to update screen
         function updateFlag(mode) {
             // eemalda vanad klassid
@@ -33,15 +35,19 @@
 
             const m = (mode || "DANGER").toUpperCase();
 
-            if (m === "SAFE") {
+            const safe = (RACE_MODES.SAFE || "SAFE").toUpperCase();           //15.1
+            const hazard = (RACE_MODES.HAZARD || "HAZARD").toUpperCase();      //15.1
+            const finish = (RACE_MODES.FINISH || "FINISH").toUpperCase();       //15.1 constants
+
+            if (m === safe) {    //15.1 "SAFE" to safe
                 body.classList.add("flag-safe");
                 flagText.textContent = "SAFE";
             }
-            else if (m === "HAZARD") {
+            else if (m === hazard) {    //15.1 constants
                 body.classList.add("flag-hazard");
                 flagText.textContent = "HAZARD";
             }
-            else if (m === "FINISH") {
+            else if (m === finish) {     //15.1 constants
                 body.classList.add("flag-finish");
                 flagText.textContent = "FINISH";
             }
@@ -55,6 +61,10 @@
             if (state && state.raceMode) {
                 updateFlag(state.raceMode);
             }
+        });
+
+        socket.on("initConstants", (constants) => {     //15.1 constants
+            RACE_MODES = constants.RACE_MODES;
         });
 
         socket.on("flagChanged", (mode) => {

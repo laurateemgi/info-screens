@@ -179,6 +179,8 @@
         const raceStatusEl = document.getElementById("race-status");
         const currentModeEl = document.getElementById("current-mode");
 
+        let RACE_MODES = {}; //15.1 constants
+
         accessKeyInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 unlock();
@@ -269,20 +271,20 @@
 
         // Change race flag to SAFE
         safeBtn.addEventListener("click", () => {
-            if (!socket) return;
-            socket.emit("setFlag", "SAFE");
+            if (!socket || !RACE_MODES.SAFE) return; //15.1 constants. added "|| !RACE_MODES SAFE" - cant press button if constants have not arrived
+            socket.emit("setFlag", RACE_MODES.SAFE);         //15.1 constants "SAFE" to RACE_MODES.SAFE
         });
 
-        // Change race flag to SAFE
+        // Change race flag to HAZARD //15.1 SAFE to HAZARD
         hazardBtn.addEventListener("click", () => {
-            if (!socket) return;
-            socket.emit("setFlag", "HAZARD");
+            if (!socket || !RACE_MODES.HAZARD) return; //15.1 constants
+            socket.emit("setFlag", RACE_MODES.HAZARD); //15.1 constants
         });
 
         // Change race flag to DANGER
         dangerBtn.addEventListener("click", () => {
-            if (!socket) return;
-            socket.emit("setFlag", "DANGER");
+            if (!socket || !RACE_MODES.DANGER) return; //15.1 constants
+            socket.emit("setFlag", RACE_MODES.DANGER);  //15.1 constants
         });
 
         // Notify server that race has finished
@@ -315,6 +317,10 @@
                 currentModeEl.textContent = state.raceMode;
                 renderControls(state);
             });
+
+            socket.on("initConstants", (constants) => {  //15.1 constants
+                RACE_MODES = constants.RACE_MODES;       //15.1
+            });                                          //15.1
 
             socket.on("disconnect", () => {
                 socket = null;
