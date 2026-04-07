@@ -101,7 +101,7 @@
                     <div class="card-body">
                         <h3>Current Race Mode</h3>
                         <p id="current-mode" class="race-info-text">
-                            Danger
+                            DANGER
                         </p>
                     </div>
                 </div>
@@ -189,22 +189,18 @@
         /* CONNECTION between our login screen and real app */
         /* unlock() = authenticate user + open the app if valid + block if not*/
         function unlock() {
-            const key = document.getElementById("access-key").value;
+            if (socket) return;
 
-            document.getElementById("auth-error").textContent = "";
+            const key = accessKeyInput.value.trim();
 
-            // Close any previous socket before creating a new login attempt
-            if (socket) {
-                socket.disconnect();
-                socket = null;
+            if (!key) {
+                authError.textContent = "Access key is required";
+                accessKeyInput.focus();
+                return;
             }
 
-            socket = io(); //now connect to io server
-
-            socket.emit("verifyKey", {
-                role: "safety",
-                key: key
-            });
+            authError.textContent = "";
+            socket = io();
 
             socket.once("authResult", ({ success }) => {
                 if (!success) {
@@ -221,6 +217,12 @@
                 authError.textContent = "";
 
                 registerSocketListeners();
+                socket.emit("requestState");
+            });
+
+            socket.emit("verifyKey", {
+                role: "safety",
+                key
             });
         }
 
@@ -261,21 +263,25 @@
 
         // When Start Race is clicked, notify the server to start the race
         startBtn.addEventListener("click", () => {
+            if (!socket) return;
             socket.emit("startRace");
         });
 
         // Change race flag to SAFE
         safeBtn.addEventListener("click", () => {
+            if (!socket) return;
             socket.emit("setFlag", "SAFE");
         });
 
         // Change race flag to SAFE
         hazardBtn.addEventListener("click", () => {
+            if (!socket) return;
             socket.emit("setFlag", "HAZARD");
         });
 
         // Change race flag to DANGER
         dangerBtn.addEventListener("click", () => {
+            if (!socket) return;
             socket.emit("setFlag", "DANGER");
         });
 
@@ -292,18 +298,12 @@
         // Listen for updated state from the server
         function registerSocketListeners() {
             socket.on("stateUpdated", (state) => {
-                // Show current session name if one exists
                 if (state.currentSession && state.currentSession.id) {
                     currentSessionEl.textContent = state.currentSession.id;
-                } else if (state.nextSession && state.nextSession.id) {
-                    currentSessionEl.textContent = state.nextSession.id;
-                } else if (state.sessions && state.sessions.length > 0) {
-                    currentSessionEl.textContent = state.sessions[0].id;
                 } else {
                     currentSessionEl.textContent = "No session selected.";
                 }
 
-                // Show race status
                 if (state.raceEnded) {
                     raceStatusEl.textContent = "Race finished";
                 } else if (state.raceStarted) {
@@ -312,17 +312,12 @@
                     raceStatusEl.textContent = "Race not started";
                 }
 
-                // Show current race mode
                 currentModeEl.textContent = state.raceMode;
                 renderControls(state);
             });
 
-            socket.on("sessionsUpdated", (sessions) => {
-                if (sessions && sessions.length > 0) {
-                    currentSessionEl.textContent = sessions[0].id;
-                } else {
-                    currentSessionEl.textContent = "No session selected.";
-                }
+            socket.on("disconnect", () => {
+                socket = null;
             });
         }
 
