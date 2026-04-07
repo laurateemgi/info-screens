@@ -110,40 +110,6 @@
             }
         });
 
-        function unlock() {
-            const key = accessKeyInput.value.trim();
-
-            if (!key) {
-                authError.textContent = "Access key is required";
-                return;
-            }
-
-            socket = io();
-
-            // AUTHENTICATION
-            socket.once("authResult", ({ success }) => {
-                if (!success) {
-                    authError.textContent = "Incorrect access key";
-                    socket.disconnect();
-                    socket = null;
-                    document.getElementById("access-key").focus();
-                    return;
-                }
-
-                document.getElementById("access-key").value = "";
-                authScreen.style.display = "none";
-                appScreen.style.display = "block";
-                authError.textContent = "";
-
-                registerSocketListeners();
-                renderLapButtons();
-            });
-
-            socket.emit("verifyKey", {
-                role: "observer",
-                key: key
-            });
-        }
 
         function registerSocketListeners() {
             socket.on("connect", () => {
@@ -159,6 +125,11 @@
                 messageDiv.innerText = "Race session ended";
                 messageDiv.classList.add("placeholder");
             });
+
+            socket.on("disconnect", () => {
+            socket = null;
+            });
+            
         }
 
         function renderLapButtons() {
@@ -196,26 +167,6 @@
                 lapButtons.push(btn);
             }
         }
-
-        /* make sure stateUpdated is not sent too early, before this page starts listening for it */
-        socket.once("authResult", ({ success }) => {
-            if (!success) {
-                authError.textContent = "Incorrect access key";
-                socket.disconnect();
-                socket = null;
-                document.getElementById("access-key").focus();
-                return;
-            }
-
-            document.getElementById("access-key").value = "";
-            authScreen.style.display = "none";
-            appScreen.style.display = "block";
-            authError.textContent = "";
-
-            registerSocketListeners();
-            renderLapButtons();
-            socket.emit("requestState");
-        });
 
         function updateLapButtonsState(state) {
             const shouldEnable = state.raceStarted && !state.raceEnded; //buttons are active only when a race is ongoing
@@ -268,6 +219,47 @@
                 btn.classList.remove("active");
             });
         }
+
+        /* make sure stateUpdated is not sent too early, before this page starts listening for it */
+        function unlock() {
+            if (socket) return;
+
+            const key = accessKeyInput.value.trim();
+
+            if (!key) {
+                authError.textContent = "Access key is required";
+                accessKeyInput.focus();
+                return;
+            }
+
+            authError.textContent = "";
+            socket = io();
+
+            socket.once("authResult", ({ success }) => {
+                if (!success) {
+                    authError.textContent = "Incorrect access key";
+                    socket.disconnect();
+                    socket = null;
+                    accessKeyInput.focus();
+                    return;
+                }
+
+                accessKeyInput.value = "";
+                authScreen.style.display = "none";
+                appScreen.style.display = "block";
+                authError.textContent = "";
+
+                registerSocketListeners();
+                renderLapButtons();
+                socket.emit("requestState");
+            });
+
+            socket.emit("verifyKey", {
+                role: "observer",
+                key
+            });
+        }
+
     </script>
 
 </body>
