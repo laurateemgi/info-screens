@@ -8,6 +8,7 @@
 
   <link rel="stylesheet" href="/styles/global.css">
   <link rel="stylesheet" href="/styles/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -79,7 +80,7 @@
         </button>
       </div>
 
-    
+
 
       <!-- Session cards rendered by Socket.IO -->
       <div id="sessions" class="grid"></div>
@@ -134,7 +135,7 @@
             accessInput.focus();
             return;
           }
-          
+
           accessInput.value = ""; //clear input field (security + clean UI)
           //if auth is SUCCESSFUL
           authScreen.style.display = "none"; //hide login screen
@@ -173,7 +174,7 @@
         });
 
         socket.on("disconnect", () => { //reset socket on failure and disconnect
-            socket = null;
+          socket = null;
         });
       }
 
@@ -322,9 +323,9 @@
         const name = input.value;
 
         if (name.length > MAX_NAME_LENGTH) {
-        input.value = name.slice(0, MAX_NAME_LENGTH);
+          input.value = name.slice(0, MAX_NAME_LENGTH);
 
-        showTemporarySessionError(
+          showTemporarySessionError(
             sessionId,
             `Max ${MAX_NAME_LENGTH} characters allowed`
           );
@@ -381,13 +382,13 @@
                         <button
                             class="edit-btn"
                             onclick='editDriver(${JSON.stringify(session.id)}, ${JSON.stringify(d.name)})'>
-                            Edit
+                            <i class="fa-solid fa-pen"></i>
                         </button>
 
                         <button 
                             class="remove-btn"
                             onclick='removeDriver(${JSON.stringify(session.id)}, ${JSON.stringify(d.name)})'>
-                            X
+                            <i class="fa-solid fa-trash"></i>
                         </button>
                     </li>
                 `).join("")}
