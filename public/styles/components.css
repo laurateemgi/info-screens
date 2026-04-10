@@ -5,7 +5,7 @@
 ============================== */
 .btn {
     font-family: 'Orbitron', sans-serif;
-    margin: 12px;
+    margin: 0px;
     font-size: 16px;
     font-weight: 700;
     padding: 16px 32px;
@@ -17,8 +17,17 @@
     position: relative;
     overflow: hidden;
     transition: 0.3s;
-    display: inline-block;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
     box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+
+
 }
 
 /* Button hover effect */
@@ -141,6 +150,7 @@
     background: #222;
     color: white;
     flex: 1;
+    margin-right: 12px;
 }
 
 /* ==============================
@@ -519,7 +529,7 @@
 
 .driver-row {
     display: grid;
-    grid-template-columns: 70px minmax(0, 1fr) 70px 44px;
+    grid-template-columns: 70px minmax(0, 1fr) 44px 44px;
     /* name can shrink properly inside grid */
     align-items: center;
     gap: 10px;
@@ -600,18 +610,19 @@
 /* Driver form inputs */
 .driver-form {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) 140px 140px;
+    /* grid-template-columns: 2fr 1fr 1fr; */
     gap: 16px;
     margin-top: 25px;
-    align-items: center;
-    padding-right: 15px;
+    align-items: stretch;
+    /* padding-right: 15px; */
 }
 
 /* RESPONSIVE: stack driver form inputs and buttons on mobile */
 @media (max-width: 600px) {
     .driver-form {
         grid-template-columns: 1fr;
-        gap: 2px;
+        gap: 12px;
     }
 }
 
@@ -624,7 +635,7 @@
     font-family: 'Orbitron', sans-serif;
     font-size: 16px;
     width: 100%;
-    margin-left: 11px;
+    /* margin-left: 11px; */
 }
 
 /* RESPONSIVE: smaller buttons on mobile */
@@ -659,6 +670,7 @@
 
 .driver-form .btn {
     width: 100%;
+    min-height: 52px;
 }
 
 
@@ -697,38 +709,24 @@
    EDIT BUTTON 
 ============================== */
 .edit-btn {
-    font-family: 'Orbitron', sans-serif;
     background: #5a5a5a;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
-    width: 64px;
-    min-width: 64px;
-    max-width: 64px;
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
     height: 32px;
-    padding: 0;
-    margin: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
-    box-sizing: border-box;
+
 }
 
 .edit-btn:hover {
     background: #6f6f6f;
-}
-
-/* edit button phone */
-@media (max-width: 600px) {
-    .edit-btn {
-        width: 58px;
-        min-width: 58px;
-        max-width: 58px;
-        font-size: 11px;
-    }
 }
 
 @media (max-width: 600px) {
@@ -1074,4 +1072,50 @@
     color: gold;
     display: block;
     margin-bottom: 5px;
+}
+
+/* ==============================
+   Race control smaller cards = buttons more visible
+============================== */
+
+@media (max-width: 600px) {
+
+    .grid-3 {
+        grid-template-columns: 1fr;
+        /* stack cards */
+        gap: 10px;
+        /* tighter spacing */
+    }
+
+    @media (max-width: 600px) {
+
+        .grid-3 .card {
+            padding: 10px;
+            height: 88px;
+        }
+
+        .grid-3 .card-body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* vertical center */
+
+        }
+
+        .grid-3 .card h3 {
+            font-size: 16px;
+        }
+
+        .race-info-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .controls-grid .btn {
+            padding: 16px 18px;
+            font-size: 15px;
+            min-height: 48px;
+        }
+    }
 }
