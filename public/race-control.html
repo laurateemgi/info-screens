@@ -179,6 +179,15 @@
         const raceStatusEl = document.getElementById("race-status");
         const currentModeEl = document.getElementById("current-mode");
 
+        // --- Ühtlase tekstistiili jaoks (suur algustäht + väiketähed) ---
+        function formatUIStatus(text) {
+            if (!text) return "";
+            // 1. Convert everything to lowercase
+            let lower = text.toLowerCase();
+            // 2. Capitalize only the very first letter and attach the rest
+            return lower.charAt(0).toUpperCase() + lower.slice(1);
+        }
+
         let RACE_MODES = {}; //15.1 constants
 
         accessKeyInput.addEventListener("keydown", (event) => {
@@ -301,20 +310,20 @@
         function registerSocketListeners() {
             socket.on("stateUpdated", (state) => {
                 if (state.currentSession && state.currentSession.id) {
-                    currentSessionEl.textContent = state.currentSession.id;
+                    currentSessionEl.textContent = formatUIStatus(state.currentSession.id);
                 } else {
                     currentSessionEl.textContent = "No session selected.";
                 }
 
                 if (state.raceEnded) {
-                    raceStatusEl.textContent = "Race finished";
+                    raceStatusEl.textContent = formatUIStatus("Race finished");
                 } else if (state.raceStarted) {
-                    raceStatusEl.textContent = "Race is running";
+                    raceStatusEl.textContent = formatUIStatus("Race is running");
                 } else {
-                    raceStatusEl.textContent = "Race not started";
+                    raceStatusEl.textContent = formatUIStatus("Race not started");
                 }
 
-                currentModeEl.textContent = state.raceMode;
+                currentModeEl.textContent = formatUIStatus(state.raceMode);
                 renderControls(state);
             });
 
