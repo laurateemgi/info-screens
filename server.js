@@ -25,6 +25,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 // 13.1 constants
 const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants");
+const path = require("path");  //16.1 express routes
 
 
 //////////////////
@@ -34,6 +35,7 @@ const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const PORT = process.env.PORT || 3000; //17.1 port edit
 
 ///////////////////////////
 // Middleware and routes //
@@ -45,8 +47,38 @@ app.get('/', (req, res) => {
   res.send('<h1>info-screens TBD</h1>'); // 1.2.1 kommentaariks juurde, et see on lihtsalt localhost 3000 testimiseks. Html lehed praegu tühjad, aga laevad ära.
 });
 
-server.listen(3000, () => {
-  console.log("Server running on port 3000");
+//16.1 express routes below
+app.get("/front-desk", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "front-desk.html"));
+});
+
+app.get("/lap-line-tracker", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "lap-line-tracker.html"));
+});
+
+app.get("/leaderboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "leaderboard.html"));
+});
+
+app.get("/next-race", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "next-race.html"));
+});
+
+app.get("/race-control", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "race-control.html"));
+});
+
+app.get("/race-countdown", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "race-countdown.html"));
+});
+
+app.get("/race-flags", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "race-flags.html"));
+});
+
+//17.1 port edit
+server.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
 });
 
 ////////////////////////////////
