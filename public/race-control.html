@@ -320,14 +320,28 @@
         // Listen for updated state from the server
         function registerSocketListeners() {
             socket.on("stateUpdated", (state) => {
-                if (state.currentSession && state.currentSession.id) {
-                    currentSessionEl.textContent = formatUIStatus(state.currentSession.id);
+                // muudatuse peamine põhjus on see, et UI ei tohi sõltuda ainult currentSession ja nextSession väljadest, vaid peab enne starti ja pärast session end’i oskama võtta info sessions massiivist.
+                const sessions = state.sessions || [];
+
+                let visibleCurrent = null;
+                let visibleUpcoming = null;
+
+                if (state.raceStarted) {
+                    visibleCurrent = state.currentSession || null;
+                    visibleUpcoming = state.nextSession || null;
+                } else {
+                    visibleCurrent = sessions[0] || null;
+                    visibleUpcoming = sessions[1] || null;
+                }
+
+                if (visibleCurrent && visibleCurrent.id) {
+                    currentSessionEl.textContent = formatUIStatus(visibleCurrent.id);
                 } else {
                     currentSessionEl.textContent = "No session selected.";
                 }
 
-                if (state.nextSession && state.nextSession.id) {
-                    upcomingSessionEl.textContent = formatUIStatus(state.nextSession.id);
+                if (visibleUpcoming && visibleUpcoming.id) {
+                    upcomingSessionEl.textContent = formatUIStatus(visibleUpcoming.id);
                 } else {
                     upcomingSessionEl.textContent = "No upcoming sessions.";
                 }
