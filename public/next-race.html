@@ -97,6 +97,8 @@
 
         socket.on("connect", () => {
             console.log("Next Race screen connected");
+            socket.emit("requestSessions"); // fetch current sessions on load/refresh
+            socket.emit("requestState");    // fetch current state on load/refresh
         });
 
 

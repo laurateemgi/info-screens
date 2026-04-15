@@ -124,6 +124,9 @@ io.on("connection", (socket) => {
     socket.emit("stateUpdated", state);
   });
 
+  socket.on("requestSessions", () => {
+    socket.emit("sessionsUpdated", state.sessions);
+  });
 
   socket.on("requestLeaderboard", () => {
     socket.emit("leaderboardUpdated", state.laps);
