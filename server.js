@@ -423,7 +423,26 @@ io.on("connection", (socket) => {
     if (!state.currentSession && !state.sessions.length) return; //13.1 lubab sessionit lõpetada ilma race'ita ning erakorraliselt enne race'i lõppu.
 
     if (state.currentSession) { // 4.1 (16 MAR) if cond add (kui race algas)
-      state.lastFinishedSession = state.currentSession;
+      // state.lastFinishedSession = state.currentSession; - selle asemel vaja salvestada eelmise sõidu info
+      state.lastFinishedSession = {
+        id: state.currentSession.id, // salvestab session ID
+        drivers: state.currentSession.drivers.map(driver => ({ // kopeerib sõitjate info
+          name: driver.name,
+          carNumber: driver.carNumber
+        })),
+        laps: {} // tühi objekt, kuhu eelmise sõidu info panna
+      };
+
+      // copy lap data
+      for (const carNumber in state.laps) {
+        state.lastFinishedSession.laps[carNumber] = {
+          driverName: state.laps[carNumber].driverName,
+          lap: state.laps[carNumber].lap,
+          fastest: state.laps[carNumber].fastest,
+          lastLap: state.laps[carNumber].lastLap
+        };
+      }
+
       state.currentSession = null;
     }
     else if (state.sessions.length) { // 4.1 (16MAR) if cond add (kui session algas, aga race'i ei alustatud ja tahetakse session lõpetada. tehniline error vms)

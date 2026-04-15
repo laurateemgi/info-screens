@@ -130,16 +130,29 @@
 
             // 2. Listen for full state updates (on refresh or change)
             socket.on("stateUpdated", (state) => {
-                if (state) {
-                    if (typeof state.timer === "number") {
-                        timerEl.textContent = formatTime(state.timer);
-                    }
-                    if (state.raceMode) {
-                        updateLeaderboardFlag(state.raceMode);
-                    }
+                if (!state) return;
+
+                // timer
+                if (typeof state.timer === "number") {
+                    timerEl.textContent = formatTime(state.timer);
+                }
+
+                // flag
+                if (state.raceMode) {
+                    updateLeaderboardFlag(state.raceMode);
+                }
+
+                // MAIN FIX, et peale end session kuvaks lehel infot edasi
+                if (state.raceStarted) {
+                    // During race → live data
+                    renderLeaderboard(state.laps);
+                } else if (state.lastFinishedSession && state.lastFinishedSession.laps) {
+                    // After END SESSION → use saved data
+                    renderLeaderboard(state.lastFinishedSession.laps);
+                } else {
+                    renderLeaderboard({});
                 }
             });
-
             // 3. Listen for immediate flag changes
             socket.on("flagChanged", (mode) => {
                 updateLeaderboardFlag(mode);
@@ -147,14 +160,9 @@
 
 
 
-            // Listen for leaderboard updates from server
-            socket.on("leaderboardUpdated", (laps) => {
-                renderLeaderboard(laps);
-            });
 
             // Show data after refresh
             socket.emit("requestState");
-            socket.emit("requestLeaderboard");
 
             // Convert milliseconds to seconds
             function formatLapTime(ms) {
@@ -162,6 +170,25 @@
 
                 const seconds = ms / 1000;
                 return seconds.toFixed(2) + " sec";
+            }
+            function getLeaderboardData(state) {
+
+                // race running
+                if (state.raceStarted && !state.raceEnded) {
+                    return state.laps;
+                }
+
+                // race finished but session not ended yet
+                if (state.raceEnded && state.currentSession) {
+                    return state.laps;
+                }
+
+                // after session ended
+                if (!state.currentSession && state.lastFinishedSession) {
+                    return state.lastFinishedSession.laps || {};
+                }
+
+                return {};
             }
 
             // Function to render table rows
