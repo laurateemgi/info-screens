@@ -88,6 +88,12 @@
                 console.log("Leaderboard connected");
             });
 
+            socket.on("leaderboardUpdated", (laps) => {
+                console.log("LEADERBOARD UPDATE:", laps);
+
+                renderLeaderboard(laps);
+            });
+
             // Function to format seconds into MM:SS
             function formatTime(seconds) {
                 const minutes = Math.floor(seconds / 60);
@@ -163,6 +169,7 @@
 
             // Show data after refresh
             socket.emit("requestState");
+            // socket.emit("requestLeaderboard"); see hävitab data peale end sessionit!
 
             // Convert milliseconds to seconds
             function formatLapTime(ms) {
