@@ -132,9 +132,9 @@
             });
 
             socket.on("disconnect", () => {
-            socket = null;
+                socket = null;
             });
-            
+
         }
 
         function renderLapButtons() {
@@ -174,7 +174,8 @@
         }
 
         function updateLapButtonsState(state) {
-            const shouldEnable = state.raceStarted && !state.raceEnded; //buttons are active only when a race is ongoing
+            const isDanger = state.raceMode === "DANGER";
+            const shouldEnable = state.raceStarted && !state.raceEnded && !isDanger; //buttons are active only when a race is ongoing
 
             // get only active cars from current session
             let activeCars = [];
@@ -205,7 +206,10 @@
             });
 
             // message logic
-            if (state.raceEnded) {
+            if (isDanger && state.raceStarted && !state.raceEnded) {
+                messageDiv.innerText = "DANGER — Stop driving";
+                messageDiv.classList.add("placeholder");
+            } else if (state.raceEnded) {
                 messageDiv.innerText = "Race finished. Waiting for session end.";
                 messageDiv.classList.add("placeholder");
             } else if (state.raceStarted) {
