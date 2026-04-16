@@ -97,7 +97,7 @@
         const authScreen = document.getElementById("auth-screen");
         const appScreen = document.getElementById("app-screen");
         const authError = document.getElementById("auth-error");
-        const accessKeyInput = document.getElementById("access-key");
+        const accessInput = document.getElementById("access-key");
 
         const lapButtonsDiv = document.getElementById("lap-buttons");
         const messageDiv = document.getElementById("message");
@@ -105,7 +105,7 @@
         let lapButtons = [];
         let MAX_DRIVERS = 8;  //15.1 constants
 
-        accessKeyInput.addEventListener("keydown", (event) => {
+        accessInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 unlock();
             }
@@ -233,11 +233,11 @@
         function unlock() {
             if (socket) return;
 
-            const key = accessKeyInput.value.trim();
+            const key = accessInput.value.trim();
 
             if (!key) {
                 authError.textContent = "Access key is required";
-                accessKeyInput.focus();
+                accessInput.focus();
                 return;
             }
 
@@ -247,13 +247,14 @@
             socket.once("authResult", ({ success }) => {
                 if (!success) {
                     authError.textContent = "Incorrect access key";
+                    accessInput.value = "";
                     socket.disconnect();
                     socket = null;
-                    accessKeyInput.focus();
+                    accessInput.focus();
                     return;
                 }
 
-                accessKeyInput.value = "";
+                accessInput.value = "";
                 authScreen.style.display = "none";
                 appScreen.style.display = "block";
                 authError.textContent = "";

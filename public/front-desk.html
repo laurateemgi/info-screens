@@ -130,6 +130,7 @@
         socket.once("authResult", ({ success }) => { //listen for auth result from server ONCE per login attempt
           if (!success) { //FAILED AUTH
             authError.textContent = "Incorrect access key";
+            accessInput.value = "";
             socket.disconnect();
             socket = null; //reset socket variable
             accessInput.focus();
