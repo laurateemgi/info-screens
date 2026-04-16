@@ -81,7 +81,7 @@
                     <div class="card-body">
                         <h3>Current Session</h3>
                         <p id="current-session" class="race-info-text">
-                            No session selected.
+                            No active session yet.
                         </p>
                     </div>
                 </div>
@@ -326,10 +326,15 @@
                 let visibleCurrent = null;
                 let visibleUpcoming = null;
 
-                if (state.raceStarted) {
-                    visibleCurrent = state.currentSession || null;
+                if (state.currentSession) {
+                    visibleCurrent = state.currentSession;
+                    visibleUpcoming = state.nextSession || null;
+                } else if (state.lastFinishedSession && state.raceStarted) {
+                    // Show finished session only if race was just finished, not after endSession
+                    visibleCurrent = state.lastFinishedSession;
                     visibleUpcoming = state.nextSession || null;
                 } else {
+                    // After endSession or no race yet, show next queued session as current
                     visibleCurrent = sessions[0] || null;
                     visibleUpcoming = sessions[1] || null;
                 }
@@ -337,7 +342,7 @@
                 if (visibleCurrent && visibleCurrent.id) {
                     currentSessionEl.textContent = formatUIStatus(visibleCurrent.id);
                 } else {
-                    currentSessionEl.textContent = "No session selected.";
+                    currentSessionEl.textContent = "No active session yet.";
                 }
 
                 if (visibleUpcoming && visibleUpcoming.id) {

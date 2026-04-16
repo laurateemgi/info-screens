@@ -120,7 +120,6 @@ io.on("connection", (socket) => {
   socket.emit("stateUpdated", state);
 
   socket.on("requestState", () => { //make sure server doesn't send stateUpdated too early
-    if (!socket.isAuthorized) return;
     socket.emit("stateUpdated", state);
   });
 
@@ -196,6 +195,7 @@ io.on("connection", (socket) => {
     sessionCounter++;
 
     state.sessions.push(session);
+    state.nextSession = state.sessions[0] || null;
 
     io.emit("sessionsUpdated", state.sessions);
     io.emit("stateUpdated", state); //13.1 lisatud, et sessioni loomisel saaks kohe race controlis näidata, et session on loodud, mitte alles siis, kui sessioni valitakse current sessioniks.
@@ -207,6 +207,7 @@ io.on("connection", (socket) => {
     //if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada) 010426 front desk ei saa sessionit 
 
     state.sessions = state.sessions.filter(s => s.id !== sessionId);
+    state.nextSession = state.sessions[0] || null;
 
     io.emit("sessionsUpdated", state.sessions);
     io.emit("stateUpdated", state); //13.1 lisatud, et sessioni kustutamisel saaks kohe race controlis näidata, et session on kustutatud, mitte alles siis, kui sessioni valitakse current sessioniks.
@@ -300,6 +301,7 @@ io.on("connection", (socket) => {
     state.raceMode = RACE_MODES.SAFE; //13.1 constants
 
     setupLapTracking();
+    io.emit("leaderboardUpdated", state.laps);
     startTimer();
 
     io.emit("raceStarted", state);

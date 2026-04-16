@@ -118,17 +118,6 @@
                 return;
             }
 
-            socket.on("stateUpdated", (state) => {
-                const paddockMsg = document.getElementById("paddock-message");
-
-                // Check if the server says the race has ended
-                if (state.raceEnded) {
-                    paddockMsg.style.display = "flex"; // Show the alert
-                } else {
-                    paddockMsg.style.display = "none"; // Hide the alert
-                }
-            });
-
             // Show the first session only (next session)
             const nextSession = sessions[0];
 
@@ -161,6 +150,16 @@
 
                 tbody.appendChild(tr);
             });
+        });
+
+        socket.on("stateUpdated", (state) => {
+            const paddockMsg = document.getElementById("paddock-message");
+
+            if (state && state.raceEnded) {
+                paddockMsg.style.display = "flex";
+            } else {
+                paddockMsg.style.display = "none";
+            }
         });
     </script>
 
