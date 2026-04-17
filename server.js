@@ -392,7 +392,8 @@ io.on("connection", (socket) => {
 
   socket.on("recordLap", (carNumber) => {//1.2.3
     if (!socket.isAuthorized || socket.role !== "observer") return;
-    if (!state.raceStarted || state.raceEnded) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
+    if (!state.raceStarted) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
+    // state.raceEnded) return; Anna: võtsin selle rea välja, kuna peab saama lap rackida peale finishit
 
     const lapData = state.laps[carNumber];
     if (!lapData) return;

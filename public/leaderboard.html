@@ -76,29 +76,29 @@
         <script src="/socket.io/socket.io.js"></script>
 
         <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuItem = document.querySelector(".menu-item");
-            if (!menuItem) return;
+            document.addEventListener("DOMContentLoaded", () => {
+                const menuItem = document.querySelector(".menu-item");
+                if (!menuItem) return;
 
-            menuItem.addEventListener("click", (event) => {
-                if (event.target.closest(".dropdown")) return;
-                event.preventDefault();
-                if (menuItem.classList.contains("menu-open")) {
-                    menuItem.classList.remove("menu-open");
-                    menuItem.blur();
-                } else {
-                    menuItem.classList.add("menu-open");
-                }
-            });
+                menuItem.addEventListener("click", (event) => {
+                    if (event.target.closest(".dropdown")) return;
+                    event.preventDefault();
+                    if (menuItem.classList.contains("menu-open")) {
+                        menuItem.classList.remove("menu-open");
+                        menuItem.blur();
+                    } else {
+                        menuItem.classList.add("menu-open");
+                    }
+                });
 
-            document.addEventListener("click", (event) => {
-                if (!menuItem.contains(event.target)) {
-                    menuItem.classList.remove("menu-open");
-                    menuItem.blur();
-                }
+                document.addEventListener("click", (event) => {
+                    if (!menuItem.contains(event.target)) {
+                        menuItem.classList.remove("menu-open");
+                        menuItem.blur();
+                    }
+                });
             });
-        });
-        // Connect to server
+            // Connect to server
             const socket = io();
 
             const timerEl = document.getElementById("leaderboard-timer");
@@ -111,8 +111,6 @@
             });
 
             socket.on("leaderboardUpdated", (laps) => {
-                console.log("LEADERBOARD UPDATE:", laps);
-
                 renderLeaderboard(laps);
             });
 

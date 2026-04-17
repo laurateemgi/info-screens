@@ -175,7 +175,7 @@
 
         function updateLapButtonsState(state) {
             const isDanger = state.raceMode === "DANGER";
-            const shouldEnable = state.raceStarted && !state.raceEnded && !isDanger; //buttons are active only when a race is ongoing
+            const shouldEnable = state.raceStarted && !isDanger; //buttons are active only when a race is ongoing
 
             // get only active cars from current session
             let activeCars = [];
@@ -272,30 +272,30 @@
 
     </script>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const menuItem = document.querySelector(".menu-item");
-                if (!menuItem) return;
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuItem = document.querySelector(".menu-item");
+            if (!menuItem) return;
 
-                menuItem.addEventListener("click", (event) => {
-                    if (event.target.closest(".dropdown")) return;
-                    event.preventDefault();
-                    if (menuItem.classList.contains("menu-open")) {
-                        menuItem.classList.remove("menu-open");
-                        menuItem.blur();
-                    } else {
-                        menuItem.classList.add("menu-open");
-                    }
-                });
-
-                document.addEventListener("click", (event) => {
-                    if (!menuItem.contains(event.target)) {
-                        menuItem.classList.remove("menu-open");
-                        menuItem.blur();
-                    }
-                });
+            menuItem.addEventListener("click", (event) => {
+                if (event.target.closest(".dropdown")) return;
+                event.preventDefault();
+                if (menuItem.classList.contains("menu-open")) {
+                    menuItem.classList.remove("menu-open");
+                    menuItem.blur();
+                } else {
+                    menuItem.classList.add("menu-open");
+                }
             });
-        </script>
+
+            document.addEventListener("click", (event) => {
+                if (!menuItem.contains(event.target)) {
+                    menuItem.classList.remove("menu-open");
+                    menuItem.blur();
+                }
+            });
+        });
+    </script>
 
 </body>
 
