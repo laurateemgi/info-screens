@@ -231,11 +231,6 @@ body {
 .menu-item:hover .dropdown {
     display: block;
 }
-
-.menu-item:focus-within .dropdown {
-    display: block;
-}
-
 .menu-item.menu-open .dropdown {
     display: block;
 }
