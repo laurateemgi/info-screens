@@ -92,6 +92,7 @@
 
     <!-- Socket.IO -->
     <script src="/socket.io/socket.io.js"></script>
+    <script>
         document.addEventListener("DOMContentLoaded", () => {
             const menuItem = document.querySelector(".menu-item");
             if (!menuItem) return;
@@ -114,6 +115,7 @@
                 }
             });
         });
+
         const socket = io();
 
         socket.on("connect", () => {
