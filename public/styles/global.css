@@ -236,6 +236,10 @@ body {
     display: block;
 }
 
+.menu-item.menu-open .dropdown {
+    display: block;
+}
+
 .dropdown li {
     list-style: none;
 }
