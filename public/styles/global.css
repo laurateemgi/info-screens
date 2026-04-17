@@ -202,10 +202,16 @@ body {
     background: linear-gradient(145deg, #222, #111);
     transition: 0.2s;
     color: #f1c40f;
+    touch-action: manipulation;
+    outline: none;
 }
 
 .menu-item:hover {
     background: #333;
+}
+
+.menu-item:focus {
+    outline: 2px solid #ff1c40;
 }
 
 /* Dropdown */
@@ -223,6 +229,10 @@ body {
 }
 
 .menu-item:hover .dropdown {
+    display: block;
+}
+
+.menu-item:focus-within .dropdown {
     display: block;
 }
 
