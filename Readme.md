@@ -1,93 +1,160 @@
-# Info Screens README
+# Info Screens
+
+## Overview
+
+Info Screens is a real-time race management system built with Node.js, Express, and Socket.IO, providing multiple synchronized interfaces for managing and displaying race sessions, including:
+
+- Front Desk (session setup)
+- Race Control (race operations)
+- Lap Line Tracker (lap recording)
+- Public display screens (leaderboard, next race, flags, countdown)
+
+All screens stay in sync in real time via WebSockets.
+
+---
+
+## Tech Stack
+
+- Node.js
+- Express
+- Socket.IO
+- HTML / CSS / JavaScript
+- dotenv (environment variables)
+- Windows users need cross-env to run dev version
+
+---
 
 ## Authentication
 
 The app uses simple role-based access keys to protect each interface.
 
 ### Roles
-* Front Desk → RECEPTIONIST_KEY
-* Race Control → SAFETY_KEY
-* Lap Line Tracker → OBSERVER_KEY
 
-The keys are defined in an .env file, but as the .env file is not uploaded to the repository due to it not being best practice, the instructions for creating the file can be found under #LOCAL Setup below.
+- Front Desk → `RECEPTIONIST_KEY`
+- Race Control → `SAFETY_KEY`
+- Lap Line Tracker → `OBSERVER_KEY`
 
-### How authentication works
-1. User sees an auth screen
-2. Enters access key
-3. Frontend sends the key to server:
-``` 
-socket.emit("verifyKey", { role, key })
-``` 
-Server checks key and responds (with ~500ms delay):
-``` 
-socket.emit("authResult", { success }) 
-```
-4. If valid → app unlocks, if invalid → error shown, user retries
+The keys are defined in a `.env` file (not committed to the repository).
+
+---
+
+### How Authentication Works
+
+1. User sees an authentication screen  
+2. Enters access key  
+3. Frontend sends key to server: socket.emit("verifyKey", { role, key })
+4. Server validates and responds: (≈500ms delay): socket.emit("authResult", { success })
+5. If valid → access granted  
+   If invalid → error shown  
+
+---
 
 ## Behavior
-* Server **won’t start** if keys are missing in `.env`
-* Each page only accepts its **own role key**
-* Socket **connection** starts **after authentication**
-* UI is **blocked** until **login is successful**
 
-## LOCAL Setup
+- Server will not start if keys are missing in `.env`
+- Each page only accepts its own role key
+- Socket connection starts after authentication
+- UI remains locked until login is successful
 
-# Install dependencies:
+---
 
-Enter in console: npm install
+## Local Setup
 
-Then, create an empty .env file in the project root (info-screens), add the below three lines and add keys of your preference to corresponding lines replacing "yourkey":
+### 1. Install dependencies
+npm install
 
+### 2. Create `.env` file
+
+In the project root (`info-screens`), create a `.env` file:
 RECEPTIONIST_KEY=yourkey
 SAFETY_KEY=yourkey
 OBSERVER_KEY=yourkey
 
+---
 
-## Running the server
-Development mode (short 1:00 timer):
+## Running the Server
+
+### Development mode (short timer)
 npm run dev
+( Windows users first need to open package.json,
+swap line
+"dev": "NODE_ENV=dev node server.js"
+with
+"dev": "cross-env NODE_ENV=dev node server.js"
+Then in terminal:
+npm install cross-env --save --dev
+then
+npm run dev )
 
-Production mode (full 10:00 timer):
+### Production mode (full timer)
 npm start
 or
 node server.js
 
-# Server runs on:
+---
 
-http://localhost:3000
-OR
-When deployed, it runs on the port specified by the platform.
+## Server Access
 
+The server uses dynamic port configuration:
+const PORT = process.env.PORT || 3000;
 
-## Roles
+- Local: http://localhost:3000  
+- Production: Uses platform-assigned port
 
-# Receptionist (front-desk)     http://localhost:3000/front-desk
-Create/delete sessions
-Add/remove drivers
+---
 
-# Safety (race-control)         http://localhost:3000/race-control
-Start race
-Change flags and race modes
-End session
+## Application Routes
 
+### Protected Interfaces
 
-# Observer (lap-line-tracker):  http://localhost:3000/lap-line-tracker
-Record laps
+- Front Desk → `/front-desk`
+- Race Control → `/race-control`
+- Lap Line Tracker → `/lap-line-tracker`
 
-# Guest pages
-## leaderboard                     http://localhost:3000/leaderboard
-displays the leaderboard based on the fastest laps while also displaying the active flag
-## next-race                       http://localhost:3000/next-race
-displays the lineup of an upcoming race
-## race-countdown                  http://localhost:3000/race-countdown
-timer showcasing countdown until the race's end
-## race-flags                      http://localhost:3000/race-flags
-a full-screen display of the currently active flag
+### Public Displays
 
-# Max 8 drivers per session
-# Driver names max 20 characters
+- Leaderboard → `/leaderboard`
+- Next Race → `/next-race`
+- Countdown → `/race-countdown`
+- Flags Display → `/race-flags`
 
-## Timer:
+---
 
-Dev: 60 seconds
-Prod: 600 seconds
+## Features
+
+- Real-time updates across all screens (Socket.IO)
+- Role-based authentication system
+- Session and driver management
+- Live leaderboard with fastest lap tracking
+- Dynamic race flag system
+- Multi-screen synchronization
+
+---
+
+## Constants
+
+Defined in `constants.js` and shared with clients:
+
+- `MAX_DRIVERS`
+- `MAX_NAME_LENGTH`
+- `RACE_MODES` (SAFE, HAZARD, DANGER, FINISH)
+- `TIMER` (DEV / PROD)
+
+Sent to clients via:
+socket.emit("initConstants", {...})
+
+---
+
+## Limits
+
+- Maximum 8 drivers per session
+- Driver names limited to 20 characters
+
+---
+
+## Timer
+
+- Development: 60 seconds  
+- Production: 600 seconds  
+
+---
