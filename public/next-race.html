@@ -78,8 +78,7 @@
 
                     <div id="paddock-message" class="paddock-alert" style="display: none; margin-top: 20px;">
                         <div class="paddock-text">
-                            <strong>RACE FINISHED</strong>
-                            <p>Please safely exit the track and proceed to the paddock.</p>
+                            <strong>Next race starting soon, proceed to the paddock!</strong>
                         </div>
                     </div>
 
@@ -175,15 +174,52 @@
             });
         });
 
+        // Jälgib, kas eelmine sessioon on lõppenud,et teada millal paddock msg näidata
+        let sessionJustEnded = false;
+        // Refreshimisel ei kao paddock msg ära
         socket.on("stateUpdated", (state) => {
-            const paddockMsg = document.getElementById("paddock-message");
+            if (!state.raceStarted && state.lastFinishedSession) {
+                sessionJustEnded = true;
+            }
 
-            if (state && state.raceEnded) {
+            const paddockMsg = document.getElementById("paddock-message");
+            // Näita sõnumit ainult siis, kui sessioon on lõppenud JA järjekorras on sõitjatega sessioone
+            if (sessionJustEnded && state.sessions && state.sessions.length > 0 && state.sessions[0].drivers.length > 0) {
                 paddockMsg.style.display = "flex";
             } else {
                 paddockMsg.style.display = "none";
             }
         });
+
+        // Näitab paddock sõnumit, kui sõit lõppeb
+        socket.on("sessionEnded", (state) => {
+            sessionJustEnded = true;
+            const paddockMsg = document.getElementById("paddock-message");
+            // Näitab sõnumit ainult siis, kui järjekorras on sõitjaid
+            if (state.sessions && state.sessions.length > 0 && state.sessions[0].drivers.length > 0) {
+                paddockMsg.style.display = "flex";
+            } else {
+                paddockMsg.style.display = "none";
+            }
+        });
+
+        // Kui uus race algab, peida paddock sõnum ja lähtesta sessionJustEnded
+        socket.on("raceStarted", () => {
+            const paddockMsg = document.getElementById("paddock-message");
+            paddockMsg.style.display = "none";
+        });
+
+        // Kui front deskis lisatakse uusi sõitjaid, näitab paddock sõnumit
+        socket.on("sessionsUpdated", (sessions) => {
+            if (!sessionJustEnded) return;
+            const paddockMsg = document.getElementById("paddock-message");
+            if (sessions && sessions.length > 0 && sessions[0].drivers.length > 0) {
+                paddockMsg.style.display = "flex";
+            } else {
+                paddockMsg.style.display = "none";
+            }
+        });
+
     </script>
 
 </body>

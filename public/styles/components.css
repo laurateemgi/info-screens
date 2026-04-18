@@ -1077,16 +1077,13 @@
 
 
 .paddock-text {
-    text-align: left;
     color: white;
-}
-
-
-.paddock-text strong {
-    font-size: 22px;
-    color: gold;
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
+    color: white;
     display: block;
-    margin-bottom: 5px;
+    margin: 5px;
 }
 
 /* ==============================
