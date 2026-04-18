@@ -220,7 +220,15 @@ io.on("connection", (socket) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
     const session = state.sessions.find(s => s.id === sessionId);
-    if (!session) return;
+    if (!session) {
+      if (state.currentSession && state.currentSession.id === sessionId) {
+        socket.emit("errorMessage", {
+          sessionId,
+          message: "Cannot add drivers to the active session during a race"
+        });
+      }
+      return;
+    }
 
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
@@ -273,6 +281,7 @@ io.on("connection", (socket) => {
     });
 
     io.emit("sessionsUpdated", state.sessions);
+    io.emit("stateUpdated", state);
   });
 
 
@@ -281,9 +290,19 @@ io.on("connection", (socket) => {
 
     //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada) 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
     const session = state.sessions.find(s => s.id === sessionId);
-    //if (!session) return; //prevents server crashes if a bad request comes in 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
+    if (!session) {
+      if (state.currentSession && state.currentSession.id === sessionId) {
+        socket.emit("errorMessage", {
+          sessionId,
+          message: "Cannot remove drivers from the active session during a race"
+        });
+      }
+      return;
+    }
+
     session.drivers = session.drivers.filter(d => d.name !== driverName);
     io.emit("sessionsUpdated", state.sessions);
+    io.emit("stateUpdated", state);
   });
 
   socket.on("startRace", () => { //1.2.3
@@ -317,10 +336,12 @@ io.on("connection", (socket) => {
 
     const session = state.sessions.find(s => s.id === sessionId);
     if (!session) {
-      socket.emit("errorMessage", {
-        sessionId,
-        message: "Session not found"
-      });
+      if (state.currentSession && state.currentSession.id === sessionId) {
+        socket.emit("errorMessage", {
+          sessionId,
+          message: "Cannot edit drivers in the active session during a race"
+        });
+      }
       return;
     }
 
@@ -368,6 +389,7 @@ io.on("connection", (socket) => {
     driver.name = trimmedName;
 
     io.emit("sessionsUpdated", state.sessions);
+    io.emit("stateUpdated", state);
   });
 
 
