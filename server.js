@@ -308,10 +308,20 @@ io.on("connection", (socket) => {
   socket.on("startRace", () => { //1.2.3
     if (!socket.isAuthorized || socket.role !== "safety") return;
     if (state.raceStarted) return; // 4.1 (16MAR) if cond add (ei saa mitut race'i korraga alustada)
-    if (!state.sessions.length) return; //4.1 if cond for if no sessions exist //tõstsin ümber
+    if (!state.sessions.length) {
+      socket.emit("errorMessage", {
+        message: "Cannot start race: no queued session available"
+      });
+      return;
+    }
 
     const nextSession = state.sessions[0];             //10.1 cant start race w/o drivers
-    if (!nextSession || nextSession.drivers.length === 0) return; //10.1 cant start race w/o drivers
+    if (!nextSession || nextSession.drivers.length === 0) {
+      socket.emit("errorMessage", {
+        message: "Cannot start race without drivers in the next session"
+      });
+      return;
+    }
 
     state.currentSession = state.sessions.shift();
     state.nextSession = state.sessions[0] || null;
