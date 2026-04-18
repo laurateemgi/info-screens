@@ -40,7 +40,7 @@
         <!-- Countdown timer -->
         <div class="countdown-container">
             <div id="countdown" class="race-countdown">
-                10:00
+                --:--
             </div>
         </div>
 
@@ -65,30 +65,30 @@
                 }
             });
         </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuItem = document.querySelector(".menu-item");
-            if (!menuItem) return;
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const menuItem = document.querySelector(".menu-item");
+                if (!menuItem) return;
 
-            menuItem.addEventListener("click", (event) => {
-                if (event.target.closest(".dropdown")) return;
-                event.preventDefault();
-                if (menuItem.classList.contains("menu-open")) {
-                    menuItem.classList.remove("menu-open");
-                    menuItem.blur();
-                } else {
-                    menuItem.classList.add("menu-open");
-                }
-            });
+                menuItem.addEventListener("click", (event) => {
+                    if (event.target.closest(".dropdown")) return;
+                    event.preventDefault();
+                    if (menuItem.classList.contains("menu-open")) {
+                        menuItem.classList.remove("menu-open");
+                        menuItem.blur();
+                    } else {
+                        menuItem.classList.add("menu-open");
+                    }
+                });
 
-            document.addEventListener("click", (event) => {
-                if (!menuItem.contains(event.target)) {
-                    menuItem.classList.remove("menu-open");
-                    menuItem.blur();
-                }
+                document.addEventListener("click", (event) => {
+                    if (!menuItem.contains(event.target)) {
+                        menuItem.classList.remove("menu-open");
+                        menuItem.blur();
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
