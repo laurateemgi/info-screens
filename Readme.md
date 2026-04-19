@@ -94,7 +94,6 @@ npm install cross-env --save --dev
 3. Run:
 ```
 npm install cross-env --save --dev
-npm install cross-env --save --dev
 ```
 
 #### B Production mode (full timer - 600 seconds)
