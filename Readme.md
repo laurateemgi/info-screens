@@ -1,10 +1,10 @@
 # Info Screens
 
 The authors of this project are:
-1. Kenneth Ottas
-2. Laura Teemägi
+1. Anna Silvia Seemel
+2. Kenneth Ottas
 3. Kristel Kalda
-4. Anna Silvia Seemel
+4. Laura Teemägi
 
 ## Overview
 
@@ -19,6 +19,17 @@ All screens stay in sync in real time via WebSockets.
 
 ---
 
+## Features
+
+* Real-time updates across all screens (Socket.IO)
+* Role-based authentication system
+* Session and driver management
+* Live leaderboard with fastest lap tracking
+* Dynamic race flag system
+* Multi-screen synchronization
+
+---
+
 ## Tech Stack
 
 - Node.js
@@ -27,6 +38,45 @@ All screens stay in sync in real time via WebSockets.
 - HTML / CSS / JavaScript
 - dotenv (environment variables)
 - Windows users must use `cross-env` for development mode
+
+---
+
+## Core state and events
+
+### The shared server state all clients sync from:
+`state = {`
+  `sessions: [],`
+  `currentSession,`
+  `nextSession,`
+  `raceMode,`
+  `raceStarted,`
+  `raceEnded,`
+  `timer,`
+  `lastFinishedSession`
+`}`
+
+### And the Socket events that form the backbone of the program:
+
+* Client → Server
+`createSession`
+`deleteSession`
+`addDriver`
+`removeDriver`
+`startRace`
+`recordLap`
+`setFlag`
+`finishRace`
+`endSession`
+
+* Server → Client
+`sessionsUpdated`
+`stateUpdated`
+`raceStarted`
+`leaderboardUpdated`
+`flagChanged`
+`timerUpdated`
+`raceFinished`
+`authResult`
 
 ---
 
@@ -64,6 +114,45 @@ The keys are defined in a `.env` file (not committed to the repository).
 
 ---
 
+## Interfaces & Responsibilities
+
+### Front Desk
+Create and manage race sessions
+Add / remove drivers
+Automatic car number assignment
+
+### Race Control
+Start race
+Control race modes (Safe, Hazard, Danger, Finish)
+End session
+
+### Lap Line Tracker
+Record laps per driver
+Updates leaderboard in real time
+Public Displays
+
+### These screens do not require authentication and show live race data:
+
+* Leaderboard – live standings, lap count, fastest lap
+* Next Race – upcoming session and drivers
+* Race Countdown – remaining race time
+* Race Flags – current race flag (visual display)
+
+---
+
+## Race Flow
+
+* Front Desk creates sessions and adds drivers
+* Race Control starts the race
+* Timer starts and race enters SAFE mode
+* Lap Line Tracker records laps
+* Leaderboard updates in real time
+* Race Control changes flags (Safe / Hazard / Danger / Finish)
+* Race ends (Finish)
+* Session is ended → next session becomes active
+
+---
+
 ## QUICK START - Local Setup 
 
 ### 1. Install dependencies
@@ -79,7 +168,6 @@ RECEPTIONIST_KEY=yourkey
 SAFETY_KEY=yourkey
 OBSERVER_KEY=yourkey
 ```
-
 
 ### 3. Running the Server (A development vs B production)
 
@@ -99,7 +187,8 @@ npm install cross-env --save --dev
 2. Update `package.json` and replace `"dev": "NODE_ENV=dev node server.js"` with `"dev": "cross-env NODE_ENV=dev node server.js"`
 3. Run:
 ```
-npm install cross-env --save --dev
+npm run dev
+
 ```
 
 #### B Production mode (full timer - 600 seconds)
@@ -129,6 +218,17 @@ The app is deployed on Railway. All clients connect to the same server instance 
 
 **Live app:** https://info-screens-production.up.railway.app/front-desk
 
+## Live app key issue:
+
+As you can not access the deployed version's employee screens w/o correct keys, these will be shared with you below. 
+Disclaimer: We are aware that it is not standard practice to provide active security keys via a readme file, but since this is a school project and to save you, the reviewer, and us from extra friction, the very secure security keys are here:
+```
+RECEPTIONIST_KEY=autod
+SAFETY_KEY=start
+OBSERVER_KEY=ringid
+```
+
+---
 
 ## Application Routes
 
@@ -144,17 +244,6 @@ The app is deployed on Railway. All clients connect to the same server instance 
 - Next Race → `/next-race`
 - Countdown → `/race-countdown`
 - Flags Display → `/race-flags`
-
----
-
-## Features
-
-- Real-time updates across all screens (Socket.IO)
-- Role-based authentication system
-- Session and driver management
-- Live leaderboard with fastest lap tracking
-- Dynamic race flag system
-- Multi-screen synchronization
 
 ---
 
