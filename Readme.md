@@ -1,5 +1,11 @@
 # Info Screens
 
+The authors of this project are:
+1. Kenneth Ottas
+2. Laura Teemägi
+3. Krisel Kalda
+4. Anna Silvia Seemel
+
 ## Overview
 
 Info Screens is a real-time race management system built with Node.js, Express, and Socket.IO, providing multiple synchronized interfaces for managing and displaying race sessions, including:
