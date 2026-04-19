@@ -3,7 +3,7 @@
 The authors of this project are:
 1. Kenneth Ottas
 2. Laura Teemägi
-3. Krisel Kalda
+3. Kristel Kalda
 4. Anna Silvia Seemel
 
 ## Overview
