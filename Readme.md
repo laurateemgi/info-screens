@@ -117,9 +117,9 @@ Open http://localhost:3000/front-desk
 ## Server Access
 
 The server uses dynamic port configuration:
-const PORT = process.env.PORT || 3000;
+`const PORT = process.env.PORT || 3000;`
 
-- Local: http://localhost:3000  
+- Local: `http://localhost:3000`
 - Production: Uses platform-assigned port
 
 ---
