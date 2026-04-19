@@ -82,10 +82,10 @@ Run:
 ```
 npm run dev
 ```
-open http://localhost:3000/front-desk
+Open http://localhost:3000/front-desk
 
 
-**Windows users (dev mode)**
+**NB! Windows users (dev mode)**
 1. Install:
 ```
 npm install cross-env --save --dev
@@ -105,6 +105,7 @@ or
 ```
 node server.js
 ```
+Open http://localhost:3000/front-desk
 
 ---
 
@@ -161,8 +162,7 @@ Defined in `constants.js` and shared with clients:
 - `RACE_MODES` (SAFE, HAZARD, DANGER, FINISH)
 - `TIMER` (DEV / PROD)
 
-Sent to clients via:
-socket.emit("initConstants", {...})
+Sent to clients via: `socket.emit("initConstants", {...})`
 
 ---
 
