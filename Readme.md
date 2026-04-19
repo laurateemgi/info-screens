@@ -117,21 +117,16 @@ The keys are defined in a `.env` file (not committed to the repository).
 ## Interfaces & Responsibilities
 
 ### Front Desk
-Create and manage race sessions
-Add / remove drivers
-Automatic car number assignment
+Create and manage race sessions, add / remove drivers, allows automatic car number assignment.
 
 ### Race Control
-Start race
-Control race modes (Safe, Hazard, Danger, Finish)
-End session
+Start race, control race modes (Safe, Hazard, Danger, Finish) or end session.
 
 ### Lap Line Tracker
-Record laps per driver
-Updates leaderboard in real time
-Public Displays
+Record laps per driver, updates leaderboard in real time
 
-### These screens do not require authentication and show live race data:
+### Public Displays
+These screens **do not require authentication** and **show live race data**:
 
 * Leaderboard – live standings, lap count, fastest lap
 * Next Race – upcoming session and drivers
