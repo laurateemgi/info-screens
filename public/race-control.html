@@ -21,11 +21,11 @@
                 Menu ▾
                 <ul class="dropdown">
                     <li><a href="/front-desk" target="_blank" rel="noopener noreferrer">Front Desk</a></li>
+                    <li><a href="/race-control" target="_blank" rel="noopener noreferrer">Race Control</a></li>
                     <li><a href="/lap-line-tracker" target="_blank" rel="noopener noreferrer">Lap Line Tracker</a>
                     </li>
-                    <li><a href="/leaderboard" target="_blank" rel="noopener noreferrer">Leaderboard</a></li>
                     <li><a href="/next-race" target="_blank" rel="noopener noreferrer">Next Race</a></li>
-                    <li><a href="/race-control" target="_blank" rel="noopener noreferrer">Race Control</a></li>
+                    <li><a href="/leaderboard" target="_blank" rel="noopener noreferrer">Leaderboard</a></li>
                     <li><a href="/race-countdown" target="_blank" rel="noopener noreferrer">Countdown</a></li>
                     <li><a href="/race-flags" target="_blank" rel="noopener noreferrer">Flag Display</a></li>
                 </ul>
@@ -91,7 +91,7 @@
                     <div class="card-body">
                         <h3>Upcoming Session</h3>
                         <p id="upcoming-session" class="race-info-text">
-                            No upcoming session.
+                            No upcoming session
                         </p>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                                     Hazard
                                 </button>
 
-                                <button id="danger-mode" class="btn btn-red">
+                                <button id="danger-mode" class="btn">
                                     Danger
                                 </button>
 
@@ -148,14 +148,15 @@
                                     Finish
                                 </button>
 
-                                <button id="end-session" class="btn btn-red">
+                                <button id="end-session" class="btn">
                                     End Session
                                 </button>
 
                             </div>
 
                             <!-- Error message -->
-                            <div id="race-control-error" class="error-message" style="opacity: 0; transition: opacity 0.2s;"></div>
+                            <div id="race-control-error" class="error-message"
+                                style="opacity: 0; transition: opacity 0.2s;"></div>
 
                         </div>
                     </div>
@@ -351,7 +352,7 @@
                 if (visibleUpcoming && visibleUpcoming.id) {
                     upcomingSessionEl.textContent = formatUIStatus(visibleUpcoming.id);
                 } else {
-                    upcomingSessionEl.textContent = "No upcoming sessions.";
+                    upcomingSessionEl.textContent = "No upcoming sessions";
                 }
 
                 if (state.raceEnded) {
@@ -370,27 +371,27 @@
                 RACE_MODES = constants.RACE_MODES;       //15.1
             });                                          //15.1
 
-                socket.on("errorMessage", ({ message }) => {
-                    if (!message) return;
-                    showRaceControlError(message);
-                });
+            socket.on("errorMessage", ({ message }) => {
+                if (!message) return;
+                showRaceControlError(message);
+            });
 
             socket.on("disconnect", () => {
                 socket = null;
             });
         }
 
-            function showRaceControlError(message) {
-                const errorEl = document.getElementById("race-control-error");
-                if (!errorEl) return;
-                errorEl.textContent = message;
-                errorEl.style.opacity = "1";
+        function showRaceControlError(message) {
+            const errorEl = document.getElementById("race-control-error");
+            if (!errorEl) return;
+            errorEl.textContent = message;
+            errorEl.style.opacity = "1";
 
-                clearTimeout(errorEl._hideTimeout);
-                errorEl._hideTimeout = setTimeout(() => {
-                    errorEl.style.opacity = "0";
-                }, 5000);
-            }
+            clearTimeout(errorEl._hideTimeout);
+            errorEl._hideTimeout = setTimeout(() => {
+                errorEl.style.opacity = "0";
+            }, 5000);
+        }
 
 
     </script>
