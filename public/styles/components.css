@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
 
-/* ==============================
-   BUTTON SYSTEM
-============================== */
+/* --- BUTTON SYSTEM --- */
 .btn {
     font-family: 'Orbitron', sans-serif;
     margin: 0px;
@@ -30,12 +28,12 @@
 
 }
 
-/* Button hover effect */
+/* --- Button hover effect --- */
 .btn:hover:not(:disabled) {
     transform: scale(1.05);
 }
 
-/* Primary button variant */
+/* --- Primary button variant --- */
 .btn-primary {
     background: #fff;
     color: #000;
@@ -54,7 +52,7 @@
     cursor: not-allowed;
 }
 
-/* RESPONSIVE: smaller buttons on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .btn {
         padding: 12px 20px;
@@ -62,15 +60,11 @@
     }
 }
 
-/* ==============================
-   LAP BUTTONS special cases
-============================== */
+/* --- LAP BUTTONS --- */
 #lap-buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    /* 4 buttons per row */
     gap: 16px;
-    /* spacing between buttons */
     margin-top: 20px;
 }
 
@@ -89,7 +83,7 @@
         inset 0 -1px 2px rgba(255, 255, 255, 0.3);
 }
 
-/* Active or disabled lap buttons */
+/* --- Active or disabled lap buttons --- */
 #lap-buttons button.active {
     border-color: #000;
     background: #fff;
@@ -106,7 +100,7 @@
     opacity: 0.8;
 }
 
-/* RESPONSIVE: lap buttons stack on small screens */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     #lap-buttons {
         grid-template-columns: repeat(2, 1fr);
@@ -118,9 +112,7 @@
     }
 }
 
-/* ==============================
-   LISTS
-============================== */
+/* --- LISTS --- */
 .list {
     list-style: none;
 }
@@ -134,9 +126,7 @@
     margin-bottom: 8px;
 }
 
-/* ==============================
-   FORMS on front desk to enter driver name
-============================== */
+/* --- FORMS (front desk to enter driver name) --- */
 .form-row {
     display: flex;
     gap: 8px;
@@ -153,9 +143,7 @@
     margin-right: 12px;
 }
 
-/* ==============================
-   TABLES used for leaderboard and next race
-============================== */
+/* --- TABLES (leaderboard and next race) --- */
 .table {
     width: 100%;
     margin: auto;
@@ -195,7 +183,6 @@
     background: #111;
     color: #ffcc00;
     padding: 16px 20px;
-
 }
 
 .table td {
@@ -211,10 +198,8 @@
     background: #2b2b2b;
 }
 
-/* Row spacing */
 .table tr {
     height: 60px;
-    /* taller rows */
 }
 
 .leaderboard-table {
@@ -258,28 +243,17 @@
 }
 
 
-/* ==============================
-   RESPONSIVE TABLES
-============================== */
+/* --- RESPONSIVE --- */
 
-.table-wrapper {
-    width: 100%;
-    display: block;
-}
-
-/* Tablet */
 @media (max-width: 1024px) {
 
     .leaderboard-table th,
     .leaderboard-table td {
         padding: 10px 8px;
-        /* CHANGED */
         font-size: 14px;
-        /* CHANGED */
     }
 }
 
-/* Mobile */
 @media (max-width: 600px) {
     .leaderboard-table {
         width: 100%;
@@ -328,6 +302,8 @@
 
     .table-wrapper {
         overflow-x: hidden;
+        width: 100%;
+        display: block;
     }
 }
 
@@ -354,9 +330,7 @@
     }
 }
 
-/* ==============================
-   FLAGS
-============================== */
+/* --- FLAGS --- */
 
 .flag-screen {
     margin: 0;
@@ -394,15 +368,12 @@
     text-shadow: 1px 1px 0 white;
 }
 
-/* ==============================
-   RESPONSIVE: TABLET
-============================== */
+/* --- RESPONSIVE --- */
 
 @media (max-width: 1024px) {
 
     .flag-screen {
         font-size: 45px;
-        /*smaller text */
         padding: 30px;
     }
 
@@ -411,31 +382,23 @@
     }
 }
 
-/* ==============================
-   RESPONSIVE: MOBILE
-============================== */
+/* --- RESPONSIVE --- */
 
 @media (max-width: 600px) {
 
     .flag-screen {
         font-size: 32px;
-        /*  mobile-friendly */
         padding: 20px;
         line-height: 1.3;
-        /* better readability */
         height: 100dvh;
-        /* better mobile viewport */
     }
 
     .flag-finish {
         background-size: 120px 120px;
-        /* CHANGED */
     }
 }
 
-/* ==============================
-   TIMER
-============================== */
+/* --- TIMER --- */
 .countdown-container {
     text-align: center;
     margin-top: 40px;
@@ -450,9 +413,7 @@
     letter-spacing: 4px;
 }
 
-/* ==============================
-   RESPONSIVE: MOBILE
-============================== */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .countdown-container {
         width: 100%;
@@ -471,9 +432,7 @@
     }
 }
 
-/* ==============================
-   FRONT-DESK SESSION CARDS
-============================== */
+/* --- FRONT-DESK SESSION CARDS --- */
 #sessions {
     display: grid;
     grid-template-columns: repeat(2, minmax(400px, 1fr));
@@ -488,11 +447,10 @@
     justify-items: center;
 }
 
-/* RESPONSIVE: tablet screens */
+/* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
     #sessions {
         grid-template-columns: 1fr;
-        /* stack cards vertically */
         gap: 30px;
     }
 }
@@ -500,7 +458,6 @@
 /* Each session is a card */
 .session-card {
     background: var(--card-bg);
-    /* matches other cards */
     border: 1px solid #444;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -517,7 +474,6 @@
     margin-bottom: 15px;
     text-align: center;
     word-break: break-word;
-    /* prevent overflow */
 }
 
 /* Driver list inside card */
@@ -530,7 +486,6 @@
 .driver-row {
     display: grid;
     grid-template-columns: 70px minmax(0, 1fr) 44px 44px;
-    /* name can shrink properly inside grid */
     align-items: center;
     gap: 10px;
     background: #2e2e2e;
@@ -546,7 +501,7 @@
     background: #262626;
 }
 
-/* RESPONSIVE: shrink driver rows on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .driver-row {
         grid-template-columns: 68px minmax(0, 1fr) 58px 44px;
@@ -571,14 +526,13 @@
     scrollbar-width: thin;
 }
 
-/* Tablet view */
+/* --- RESPONSIVE --- Tablet view */
 @media (max-width: 1024px) {
     .driver-label {
         font-size: 16px;
     }
 }
 
-/* Phone view */
 @media (max-width: 600px) {
     .driver-label {
         font-size: 14px;
@@ -599,7 +553,7 @@
     box-sizing: border-box;
 }
 
-/* RESPONSIVE: badge font smaller on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .car-badge {
         font-size: 11px;
@@ -607,18 +561,16 @@
     }
 }
 
-/* Driver form inputs */
+/* --- Driver form inputs --- */
 .driver-form {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 140px 140px;
-    /* grid-template-columns: 2fr 1fr 1fr; */
     gap: 16px;
     margin-top: 25px;
     align-items: stretch;
-    /* padding-right: 15px; */
 }
 
-/* RESPONSIVE: stack driver form inputs and buttons on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .driver-form {
         grid-template-columns: 1fr;
@@ -635,10 +587,9 @@
     font-family: 'Orbitron', sans-serif;
     font-size: 16px;
     width: 100%;
-    /* margin-left: 11px; */
 }
 
-/* RESPONSIVE: smaller buttons on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
 
     .driver-form .btn,
@@ -664,7 +615,6 @@
 /* Use existing global button style */
 .session-buttons .btn {
     width: auto;
-    /* center access key button */
     padding: 12px 28px;
 }
 
@@ -674,9 +624,7 @@
 }
 
 
-/* ==============================
-   REMOVE BUTTON 
-============================== */
+/* --- REMOVE BUTTON --- */
 .remove-btn {
     font-family: 'Orbitron', sans-serif;
     background: #e31b23;
@@ -705,9 +653,7 @@
     opacity: 1;
 }
 
-/* ==============================
-   EDIT BUTTON 
-============================== */
+/* --- EDIT BUTTON --- */
 .edit-btn {
     background: #5a5a5a;
     color: white;
@@ -722,21 +668,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 
 .edit-btn:hover {
     background: #6f6f6f;
 }
 
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     #error-message {
         text-align: center;
-        /* centers text horizontally */
         color: white;
         font-weight: 600;
         margin-top: 20px;
-        /* spacing below title */
         font-size: 18px;
     }
 }
@@ -763,26 +707,13 @@
     transition: opacity 0.2s ease;
 }
 
-/* ==============================
-   RESPONSIVE: Phones / small screens
-============================== */
-
 #error-message {
     font-size: 16px;
-    /* slightly smaller for mobile readability */
     margin-top: 15px;
-    /* reduce vertical spacing */
 }
 
-/* ==============================
-   RESPONSIVE: Tablets
-============================== */
 
-
-/* ==============================
-   LEADERBOARD
-============================== */
-
+/* --- LEADERBOARD --- */
 /* Leaderboard timer + flag alignment */
 .leaderboard-race-info {
     display: flex;
@@ -792,7 +723,17 @@
     margin-top: 10px;
 }
 
-/* Small flag box */
+/* --- Timer --- */
+.leaderboard-mini-timer {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffcc00;
+    letter-spacing: 1px;
+    margin-top: 20px;
+}
+
+/* --- Flag box --- */
 .flag-box {
     width: 65px;
     height: 35px;
@@ -803,18 +744,7 @@
     transition: background-color 0.3s ease;
 }
 
-/* Minimalist Timer style */
-.leaderboard-mini-timer {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffcc00;
-    letter-spacing: 1px;
-    margin-top: 20px;
-}
-
-/* --- FLAG COLOR STATES (Crucial for JS) --- */
-
+/* --- Flag colors --- */
 .flag-box.flag-safe {
     background-color: #28a745;
 }
@@ -833,35 +763,26 @@
     border: 1px solid #fff;
 }
 
-
-
-/* Apply cups to first three rows (after thead) */
+/* --- Leaderboard places --- */
 .leaderboard-table tbody tr:nth-child(1):not(:has(.placeholder)) {
     border-left: 6px solid gold;
-    /* 1st place */
 }
 
 .leaderboard-table tbody tr:nth-child(2):not(:has(.placeholder)) {
     border-left: 6px solid silver;
-    /* 2nd place */
 }
 
 .leaderboard-table tbody tr:nth-child(3):not(:has(.placeholder)) {
     border-left: 6px solid #cd7f32;
-    /* 3rd place (bronze) */
 }
 
-/* Align table headers and cells centrally */
 .leaderboard-table th,
 .leaderboard-table td {
     text-align: center;
-    /* centers text under headings */
     vertical-align: middle;
     padding: 12px 14px;
-    /* consistent spacing */
 }
 
-/* Header slightly bolder and clearer */
 .leaderboard-table th {
     font-weight: 700;
     font-size: 18px;
@@ -875,6 +796,7 @@
     display: inline;
 }
 
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     .leaderboard-mobile-label {
         display: inline;
@@ -885,34 +807,24 @@
     }
 }
 
-
-
-/* ==============================
-   LAP TRACKER MESSAGE (for Lap Line Tracker)
-============================== */
+/* --- LAP TRACKER MESSAGE --- */
 #message {
     margin-top: 30px;
-    /* more breathing room above message */
     font-weight: bold;
     color: var(--accent-yellow);
-    /* yellow for visibility */
     font-size: 18px;
     text-align: center;
 }
 
-/* RESPONSIVE: smaller font on mobile */
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
     #message {
         font-size: 16px;
     }
 }
 
+/* --- RACE CONTROL BUTTONS --- */
 
-/* ==============================
-   RACE CONTROL 
-============================== */
-
-/* RACE CONTROL BUTTONS */
 .controls-grid {
     display: flex;
     flex-direction: row;
@@ -921,7 +833,6 @@
     gap: 16px;
     margin-top: 20px;
     flex-wrap: wrap;
-    /* allows wrapping on smaller screens */
 }
 
 .controls-grid .btn {
@@ -929,12 +840,9 @@
     text-align: center;
     width: auto;
     flex: 0 0 auto;
-    text-align: center;
 }
 
-/* ==============================
-   RACE CONTROL INFO CARDS
-============================== */
+/* --- RACE CONTROL INFO CARDS --- */
 
 .grid-3 {
     display: grid;
@@ -945,7 +853,6 @@
     margin: 0 auto 25px;
 }
 
-/* Info text centered inside cards */
 .race-info-text {
     min-height: 26px;
     align-items: center;
@@ -954,14 +861,11 @@
 
 }
 
-/* Make cards same height in top row */
 .grid-3 .card {
     height: 100%;
 }
 
-/* ==============================
-   RACE CONTROL LAYOUT
-============================== */
+/* --- RACE CONTROL LAYOUT --- */
 
 .controls-wrapper {
     display: flex;
@@ -973,21 +877,17 @@
     align-items: center;
 }
 
-/* ==============================
-   RESPONSIVE: TABLET
-============================== */
+/* --- RESPONSIVE --- */
 
 @media (max-width: 1024px) {
 
     .grid-3 {
         grid-template-columns: 1fr 1fr;
-        /* 2 cards per row */
         gap: 20px;
     }
 
     .controls-wrapper {
         min-width: auto;
-        /*remove fixed width */
         width: 100%;
     }
 
@@ -1002,15 +902,10 @@
     }
 }
 
-/* ==============================
-   RESPONSIVE: MOBILE
-============================== */
-
 @media (max-width: 600px) {
 
     .grid-3 {
         grid-template-columns: 1fr;
-        /* stack info cards */
         gap: 15px;
     }
 
@@ -1021,7 +916,6 @@
         justify-content: center;
     }
 
-    /* see aitab, et nuppude blokk kasutaks kogu laiust mobiilil, mitte ei jääks keskele väikesele alale */
     .controls-wrapper .card {
         width: 100%;
         box-sizing: border-box;
@@ -1030,18 +924,15 @@
     .controls-grid {
         display: flex;
         flex-direction: column;
-        /* buttons stacked */
         width: 100%;
         gap: 10px;
         align-items: center;
-        /* stretch asemel center */
         box-sizing: border-box;
     }
 
     .controls-grid .btn {
         display: block;
         width: 100%;
-        /* full width buttons */
         min-width: 0;
         padding: 14px;
         font-size: 14px;
@@ -1056,11 +947,7 @@
     }
 }
 
-/* ==============================
-   Next race: paddock notification
-============================== */
-
-
+/* --- Next race: paddock message --- */
 .paddock-alert {
     background: linear-gradient(135deg, #1a1a1a, #333);
     border: 3px solid gold;
@@ -1075,59 +962,52 @@
     animation: pulse-border 2s infinite;
 }
 
-
 .paddock-text {
     color: white;
     text-align: center;
     width: 100%;
     font-size: 16px;
-    color: white;
     display: block;
     margin: 5px;
 }
 
-/* ==============================
-   Race control smaller cards = buttons more visible
-============================== */
+/* --- RESPONSIVE --- */
 
 @media (max-width: 600px) {
 
     .grid-3 {
         grid-template-columns: 1fr;
-        /* stack cards */
         gap: 10px;
-        /* tighter spacing */
+    }
+}
+
+@media (max-width: 600px) {
+
+    .grid-3 .card {
+        padding: 10px;
+        height: 88px;
     }
 
-    @media (max-width: 600px) {
+    .grid-3 .card-body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
-        .grid-3 .card {
-            padding: 10px;
-            height: 88px;
-        }
+    }
 
-        .grid-3 .card-body {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            /* vertical center */
+    .grid-3 .card h3 {
+        font-size: 16px;
+    }
 
-        }
+    .race-info-text {
+        font-size: 14px;
+        font-weight: 600;
+    }
 
-        .grid-3 .card h3 {
-            font-size: 16px;
-        }
-
-        .race-info-text {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .controls-grid .btn {
-            padding: 16px 18px;
-            font-size: 15px;
-            min-height: 48px;
-        }
+    .controls-grid .btn {
+        padding: 16px 18px;
+        font-size: 15px;
+        min-height: 48px;
     }
 }

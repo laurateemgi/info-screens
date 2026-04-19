@@ -1,11 +1,7 @@
-/* IMPORT FONT */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
 
 
-/* ==============================
-   GLOBAL VARIABLES
-   Define reusable colors, spacing, and text variables for consistent styling
-============================== */
+/* --- GLOBAL VARIABLES --- */
 :root {
     --page-padding: 20px;
     --section-spacing: 40px;
@@ -24,20 +20,16 @@
     --text-main: #f1f1f1;
 }
 
-/* ==============================
-   RESET
-   Apply a global reset for box-sizing, margin, and padding
-============================== */
+/* --- RESET --- */
+/* --- Apply a global reset for box-sizing, margin, and padding --- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* ==============================
-   BODY
-   Base font, background gradient, and default text color
-============================== */
+/* --- BODY --- */
+/* --- Base font, background gradient, and default text color --- */
 body {
     font-family: 'Orbitron', sans-serif;
     min-height: 100vh;
@@ -46,17 +38,14 @@ body {
     color: var(--text-main);
 }
 
-/* ==============================
-   PAGE STRUCTURE
-   Max-width container, page header, title, subtitle, and spacing
-============================== */
+/* --- PAGE STRUCTURE --- /*
+/* --- Max-width container, page header, title, subtitle, and spacing --- */
 .page {
     max-width: 1200px;
     margin: auto;
     ;
 }
 
-/* Page title */
 .page-header {
     margin: 30px 0;
     text-align: center;
@@ -74,15 +63,12 @@ body {
     margin-top: 6px;
 }
 
-/* Sections */
 .section {
     margin-top: var(--section-spacing);
 }
 
-/* ==============================
-   GRID LAYOUT
-   Grid system for centering multiple cards per row
-============================== */
+/* --- GRID LAYOUT --- */
+/* --- Grid system for centering multiple cards per row --- */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -97,10 +83,8 @@ body {
     }
 }
 
-/* ==============================
-   CARD
-   Card with header, body, size variants, and center alignment
-============================== */
+/* --- CARD --- */
+/* --- Card with header, body, size variants, and center alignment --- */
 .card {
     background: var(--card-bg);
     border-radius: 12px;
@@ -110,7 +94,6 @@ body {
     transition: 0.2s;
     width: 100%;
 }
-
 
 .card-header {
     padding: 14px 16px;
@@ -125,7 +108,6 @@ body {
 .card-body {
     padding: var(--card-padding);
     overflow: hidden;
-    /* added for phone and tablet */
 }
 
 .card-sm {
@@ -145,28 +127,20 @@ body {
     margin-right: auto;
 }
 
-/* ==============================
-   HEADER
-   Main site header with gradient, shadow, and flex layout
-============================== */
+/* --- HEADER --- */
+/* --- Main site header with gradient, shadow, and flex layout --- */
 .site-header {
     background: linear-gradient(135deg, #111, #1e1e1e);
     padding: 16px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* ensures header stretches even if no menu */
     border-radius: 12px;
     position: relative;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
-
-    /* Force minimum height */
     min-height: 60px;
-    /* adjust as needed to match previous size */
 }
 
-
-/* Track decoration line */
 .site-header::after {
     content: "";
     position: absolute;
@@ -182,17 +156,13 @@ body {
             var(--accent-blue));
 }
 
-/* ==============================
-   MENU
-   Navigation menu with hover effects and dropdowns
-   POLE KASUTUSEL PRAEGU!
-============================== */
+/* --- MENU --- */
+/* --- Navigation menu with hover effects and dropdowns --- */
 .menu {
     display: flex;
     gap: 40px;
 }
 
-/* Menu item */
 .menu-item {
     position: relative;
     margin: 10px;
@@ -214,7 +184,6 @@ body {
     outline: 2px solid #ff1c40;
 }
 
-/* Dropdown */
 .dropdown {
     position: absolute;
     top: 100%;
@@ -231,6 +200,7 @@ body {
 .menu-item:hover .dropdown {
     display: block;
 }
+
 .menu-item.menu-open .dropdown {
     display: block;
 }
@@ -250,11 +220,7 @@ body {
     background: var(--accent-red);
 }
 
-/* ==============================
-   RESPONSIVE to tablet and phone
-============================= */
-
-/* Tablets */
+/* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
     .page-title {
         font-size: 36px;
@@ -278,7 +244,6 @@ body {
     }
 }
 
-/* Mobile phones */
 @media (max-width: 600px) {
     .page-title {
         font-size: 28px;
@@ -305,7 +270,6 @@ body {
     }
 
     .site-header {
-        /* flex-direction: column; */
         padding: 12px;
     }
 
@@ -316,6 +280,4 @@ body {
     .race-countdown {
         font-size: 10vw;
     }
-
-    /* responsive timer */
 }
