@@ -35,19 +35,19 @@
 
             const m = (mode || "DANGER").toUpperCase();
 
-            const safe = (RACE_MODES.SAFE || "SAFE").toUpperCase();           //15.1
-            const hazard = (RACE_MODES.HAZARD || "HAZARD").toUpperCase();      //15.1
-            const finish = (RACE_MODES.FINISH || "FINISH").toUpperCase();       //15.1 constants
+            const safe = (RACE_MODES.SAFE || "SAFE").toUpperCase();
+            const hazard = (RACE_MODES.HAZARD || "HAZARD").toUpperCase();
+            const finish = (RACE_MODES.FINISH || "FINISH").toUpperCase();
 
-            if (m === safe) {    //15.1 "SAFE" to safe
+            if (m === safe) {
                 body.classList.add("flag-safe");
                 flagText.textContent = "SAFE";
             }
-            else if (m === hazard) {    //15.1 constants
+            else if (m === hazard) {
                 body.classList.add("flag-hazard");
                 flagText.textContent = "HAZARD";
             }
-            else if (m === finish) {     //15.1 constants
+            else if (m === finish) {
                 body.classList.add("flag-finish");
                 flagText.textContent = "FINISH";
             }
@@ -63,7 +63,7 @@
             }
         });
 
-        socket.on("initConstants", (constants) => {     //15.1 constants
+        socket.on("initConstants", (constants) => {
             RACE_MODES = constants.RACE_MODES;
         });
 

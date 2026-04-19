@@ -202,7 +202,7 @@
             return lower.charAt(0).toUpperCase() + lower.slice(1);
         }
 
-        let RACE_MODES = {}; //15.1 constants
+        let RACE_MODES = {};
 
         accessInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
@@ -295,20 +295,20 @@
 
         // Change race flag to SAFE
         safeBtn.addEventListener("click", () => {
-            if (!socket || !RACE_MODES.SAFE) return; //15.1 constants. added "|| !RACE_MODES SAFE" - cant press button if constants have not arrived
-            socket.emit("setFlag", RACE_MODES.SAFE);         //15.1 constants "SAFE" to RACE_MODES.SAFE
+            if (!socket || !RACE_MODES.SAFE) return;
+            socket.emit("setFlag", RACE_MODES.SAFE);
         });
 
         // Change race flag to HAZARD //15.1 SAFE to HAZARD
         hazardBtn.addEventListener("click", () => {
-            if (!socket || !RACE_MODES.HAZARD) return; //15.1 constants
-            socket.emit("setFlag", RACE_MODES.HAZARD); //15.1 constants
+            if (!socket || !RACE_MODES.HAZARD) return;
+            socket.emit("setFlag", RACE_MODES.HAZARD);
         });
 
         // Change race flag to DANGER
         dangerBtn.addEventListener("click", () => {
-            if (!socket || !RACE_MODES.DANGER) return; //15.1 constants
-            socket.emit("setFlag", RACE_MODES.DANGER);  //15.1 constants
+            if (!socket || !RACE_MODES.DANGER) return;
+            socket.emit("setFlag", RACE_MODES.DANGER);
         });
 
         // Notify server that race has finished
@@ -367,9 +367,9 @@
                 renderControls(state);
             });
 
-            socket.on("initConstants", (constants) => {  //15.1 constants
-                RACE_MODES = constants.RACE_MODES;       //15.1
-            });                                          //15.1
+            socket.on("initConstants", (constants) => {
+                RACE_MODES = constants.RACE_MODES;
+            });
 
             socket.on("errorMessage", ({ message }) => {
                 if (!message) return;
