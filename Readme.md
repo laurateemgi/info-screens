@@ -20,7 +20,7 @@ All screens stay in sync in real time via WebSockets.
 - Socket.IO
 - HTML / CSS / JavaScript
 - dotenv (environment variables)
-- Windows users need cross-env to run dev version
+- Windows users must use `cross-env` for development mode
 
 ---
 
@@ -53,7 +53,7 @@ The keys are defined in a `.env` file (not committed to the repository).
 
 - Server will not start if keys are missing in `.env`
 - Each page only accepts its own role key
-- Socket connection starts after authentication
+- Socket event listeners are enabled only after successful authentication
 - UI remains locked until login is successful
 
 ---
@@ -102,6 +102,12 @@ const PORT = process.env.PORT || 3000;
 - Production: Uses platform-assigned port
 
 ---
+
+## Deployment
+The app is deployed on Railway. All clients connect to the same server instance → shared real-time state
+Live app: 
+```https://info-screens-production.up.railway.app/front-desk```
+
 
 ## Application Routes
 
