@@ -7,7 +7,7 @@ module.exports = {
         DANGER: "DANGER",
         SAFE: "SAFE",
         FINISH: "FINISH",
-        HAZARD: "HAZARD"   //13.1 see peaks ka kuskil olema i just remembered
+        HAZARD: "HAZARD" 
     },
 
     TIMER: {

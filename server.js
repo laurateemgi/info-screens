@@ -2,8 +2,7 @@
 // CONFIG //
 ////////////
 
-require("dotenv").config(); // 1.1 järgneb dotenv feature, mis enfoce'ib key'de olemasolu, kuigi ei tea,
-// 1.1 kas see järgnev panna peale const server = require socket.io-d või jääb siia ette. Imo siia ette, sest see check vb vaja esimesena teha.
+require("dotenv").config(); // Dotenv feature follows (enfoces the existence of keys)
 
 if (
   !process.env.RECEPTIONIST_KEY ||
@@ -18,15 +17,11 @@ if (
 // IMPORTS //
 /////////////
 
-// 1.1 copy-paste mix&match expressi + socketi kodukatelt, ehk siis serveri skeleton
 const express = require("express");
-//const { stat } = require("fs"); LAURA commenting it out before we delete - not needed for authentication
 const http = require("http");
 const { Server } = require("socket.io");
-// 13.1 constants
 const { MAX_DRIVERS, MAX_NAME_LENGTH, RACE_MODES, TIMER } = require("./constants");
-const path = require("path");  //16.1 express routes
-
+const path = require("path");
 
 //////////////////
 // Server setup //
@@ -35,7 +30,7 @@ const path = require("path");  //16.1 express routes
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const PORT = process.env.PORT || 3000; //17.1 port edit
+const PORT = process.env.PORT || 3000;
 
 ///////////////////////////
 // Middleware and routes //
@@ -44,10 +39,10 @@ const PORT = process.env.PORT || 3000; //17.1 port edit
 app.use(express.static("public"));
 
 app.get('/', (req, res) => {
-  res.send('<h1>info-screens TBD</h1>'); // 1.2.1 kommentaariks juurde, et see on lihtsalt localhost 3000 testimiseks. Html lehed praegu tühjad, aga laevad ära.
+  res.send('<h1>info-screens TBD</h1>'); // Unused landing page for Localhost 3000.
 });
 
-//16.1 express routes below
+// Express routes below
 app.get("/front-desk", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "front-desk.html"));
 });
@@ -76,7 +71,6 @@ app.get("/race-flags", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "race-flags.html"));
 });
 
-//17.1 port edit
 server.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
@@ -85,12 +79,11 @@ server.listen(PORT, () => {
 // Global state & global vars //
 ////////////////////////////////
 
-// 1.1 immutable shared server state // 1.2.1 kas (ja kus) on vaja broadcastState()-i?
 const state = {
   sessions: [],
   currentSession: null,
   nextSession: null,
-  raceMode: RACE_MODES.DANGER, //13.1 constants
+  raceMode: RACE_MODES.DANGER,
   raceStarted: false,
   raceEnded: false,
   timer: 0,
@@ -98,28 +91,27 @@ const state = {
   lastFinishedSession: null
 };
 
-function broadcastState() { //3.1 broadcastState, aga veel ei kasuta seda kuskil (io.emit hoopis kasutusel. vb peab ümber tegema)
+function broadcastState() {
   io.emit("stateUpdated", state);
 }
 
-// 1.1 npm start ja npn run dev on package.jsonis olemas, aga need sõltuvad actual timer funktsioonist
-let sessionCounter = 1 //1.2 start session counting from 1 so we ensure every session has a unique ID
-let timerInterval = null; // 7.1 et timer jooksma ei jääks
+
+let sessionCounter = 1 // Start session counting from 1 so we ensure every session has a unique ID
+let timerInterval = null; // Prevents non-stopping timer
 
 //////////////////////////////////
 // Socket connection and events //
 //////////////////////////////////
 
-// 1.1 socket.io ühendus
 io.on("connection", (socket) => {
   console.log("Client connected");
 
-  socket.isAuthorized = false; //authentication
+  socket.isAuthorized = false; //Authentication
   socket.role = null; //will be receptionist, safety or observer (separation of responsibilites so any role could not do anything on other pages)
 
   socket.emit("stateUpdated", state);
 
-  socket.on("requestState", () => { //make sure server doesn't send stateUpdated too early
+  socket.on("requestState", () => { //Make sure server doesn't send stateUpdated too early
     socket.emit("stateUpdated", state);
   });
 
@@ -135,16 +127,11 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
   });
 
-  // 1.2.1 leidsin selle socket event template'i otsides & võiks vajalik olla imo:
   socket.on('error', (err) => {
     console.error(`Socket error from ${socket.id}:`, err);
   });
 
 
-  // 1.2.1 panen üleüldise eventide asetuse paika (
-  // kui tahate localhosti testida, siis muutke allolev kommentaarideks, sest evendid poolikud & muidu ei saa localhost asju testida ja viskab nodes errorisse)
-
-  //1.2.2 verifyKey (also kõik evendid incl verifyKey peavad jääma ülaloleva io.on(connection) alla)
   socket.on("verifyKey", ({ role, key }) => {
 
     const roleKeys = {
@@ -156,7 +143,7 @@ io.on("connection", (socket) => {
     setTimeout(() => {
       const success = key === roleKeys[role];
 
-      if (success) { //successful login stores auth on that socket
+      if (success) { //Successful login stores auth on that socket
         socket.isAuthorized = true;
         socket.role = role;
 
@@ -181,9 +168,8 @@ io.on("connection", (socket) => {
 
   });
 
-  //1.2.3 all poolikud evendid. conditionale veel juurde vaja.
   socket.on("createSession", () => {   //1.2 session ID creation (unique IDs)
-    if (!socket.isAuthorized || socket.role !== "receptionist") return; //authentication
+    if (!socket.isAuthorized || socket.role !== "receptionist") return; //Authentication
 
     console.log("createSession event received");
     const session = {
@@ -198,24 +184,21 @@ io.on("connection", (socket) => {
     state.nextSession = state.sessions[0] || null;
 
     io.emit("sessionsUpdated", state.sessions);
-    io.emit("stateUpdated", state); //13.1 lisatud, et sessioni loomisel saaks kohe race controlis näidata, et session on loodud, mitte alles siis, kui sessioni valitakse current sessioniks.
+    io.emit("stateUpdated", state); // Lisatud, et sessioni loomisel saaks kohe race controlis näidata, et session on loodud, mitte alles siis, kui sessioni valitakse current sessioniks.
 
   });
 
-  socket.on("deleteSession", (sessionId) => {   //1.2.3
+  socket.on("deleteSession", (sessionId) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return; //auth
-    //if (state.raceStarted) return; // 4.1 (16MAR) if cond add (kui race käib siis ei saa sessionit kustutada) 010426 front desk ei saa sessionit 
-
+    
     state.sessions = state.sessions.filter(s => s.id !== sessionId);
     state.nextSession = state.sessions[0] || null;
 
     io.emit("sessionsUpdated", state.sessions);
-    io.emit("stateUpdated", state); //13.1 lisatud, et sessioni kustutamisel saaks kohe race controlis näidata, et session on kustutatud, mitte alles siis, kui sessioni valitakse current sessioniks.
+    io.emit("stateUpdated", state); // Lisatud, et sessioni kustutamisel saaks kohe race controlis näidata, et session on kustutatud, mitte alles siis, kui sessioni valitakse current sessioniks.
 
   });
 
-
-  //1.2 addDriver (max 8 drivers per session)
   socket.on("addDriver", ({ sessionId, driverName }) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
@@ -230,7 +213,6 @@ io.on("connection", (socket) => {
       return;
     }
 
-    //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race käib, siis ei saa driverit lisada)
     driverName = driverName.trim();
 
     if (!driverName) {
@@ -249,7 +231,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // max 8 drivers
+    // Max 8 drivers
     if (session.drivers.length >= MAX_DRIVERS) {
       socket.emit("errorMessage", {
         sessionId,
@@ -258,7 +240,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // prevent duplicate driver names
+    // Prevent duplicate driver names
     const normalizedName = driverName.toLowerCase();
 
     const nameExists = session.drivers.some(d => d.name.trim().toLowerCase() === normalizedName);
@@ -271,7 +253,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // find free car number
+    // Find free car number
     const carNumber = getAvailableCarNumber(session.drivers);
     if (!carNumber) return;
 
@@ -285,10 +267,9 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("removeDriver", ({ sessionId, driverName }) => { //1.2.3
+  socket.on("removeDriver", ({ sessionId, driverName }) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
-    //if (state.raceStarted) return; //4.1 (16MAR) if cond add (race'i ajal ei saa driverit eemaldada) 010426 commented out sest sessioni ajal uute sessionite driverite kustutamine häiritud
     const session = state.sessions.find(s => s.id === sessionId);
     if (!session) {
       if (state.currentSession && state.currentSession.id === sessionId) {
@@ -305,9 +286,9 @@ io.on("connection", (socket) => {
     io.emit("stateUpdated", state);
   });
 
-  socket.on("startRace", () => { //1.2.3
+  socket.on("startRace", () => {
     if (!socket.isAuthorized || socket.role !== "safety") return;
-    if (state.raceStarted) return; // 4.1 (16MAR) if cond add (ei saa mitut race'i korraga alustada)
+    if (state.raceStarted) return; // Disallows starting multiple races at the same time.
     if (!state.sessions.length) {
       socket.emit("errorMessage", {
         message: "Cannot start race: no queued session available"
@@ -315,7 +296,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    const nextSession = state.sessions[0];             //10.1 cant start race w/o drivers
+    const nextSession = state.sessions[0];             //Disallows starting races w/o drivers
     if (!nextSession || nextSession.drivers.length === 0) {
       socket.emit("errorMessage", {
         message: "Cannot start race without drivers in the next session"
@@ -327,7 +308,7 @@ io.on("connection", (socket) => {
     state.nextSession = state.sessions[0] || null;
     state.raceStarted = true;
     state.raceEnded = false;
-    state.raceMode = RACE_MODES.SAFE; //13.1 constants
+    state.raceMode = RACE_MODES.SAFE;
 
     setupLapTracking();
     io.emit("leaderboardUpdated", state.laps);
@@ -340,7 +321,6 @@ io.on("connection", (socket) => {
   });
 
 
-  /* editDriver handler event */
   socket.on("editDriver", ({ sessionId, oldName, newName }) => {
     if (!socket.isAuthorized || socket.role !== "receptionist") return;
 
@@ -403,34 +383,31 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("setFlag", (mode) => { //1.2.3
+  socket.on("setFlag", (mode) => {
 
     if (!socket.isAuthorized || socket.role !== "safety") return;
 
-    if (!state.raceStarted) return; // 4.1 (16MAR) if cond add (race ei käi, siis flag ei vahetu)
-    if (state.raceEnded) return; // Task 8.3:
-    // Kui race on lõpetatud (finishRace() käivitatud),
-    // siis lukustame race mode'i täielikult
+    if (!state.raceStarted) return; // No switching flags when no ongoing race.
+    if (state.raceEnded) return; // Kui race on lõpetatud (finishRace() käivitatud), siis lukustame race mode'i täielikult
 
-    if (!mode || typeof mode !== "string") return; //13.1 constants
-    const newMode = mode.toUpperCase();                          //13,1 constants/ lubab kasutada valid modesid
+    if (!mode || typeof mode !== "string") return;
+    const newMode = mode.toUpperCase();                          //Allows use of valid modes.
     if (!Object.values(RACE_MODES).includes(newMode)) return;
     state.raceMode = newMode;
 
-    io.emit("flagChanged", state.raceMode); // Saada uuendus kõikidele ekraanidele
+    io.emit("flagChanged", state.raceMode); // Update all screens
     io.emit("stateUpdated", state);
   });
 
 
-  socket.on("recordLap", (carNumber) => {//1.2.3
+  socket.on("recordLap", (carNumber) => {
     if (!socket.isAuthorized || socket.role !== "observer") return;
-    if (!state.raceStarted) return; //4.1 (16MAR) if cond add (kui race'i ei käi või lõppes siis record lap ei toimi)
-    // state.raceEnded) return; Anna: võtsin selle rea välja, kuna peab saama lap rackida peale finishit
+    if (!state.raceStarted) return;
 
     const lapData = state.laps[carNumber];
     if (!lapData) return;
 
-    const now = Date.now();                                     // 13,1 bugfixing, sest setuplaptracking function teeb juba seda, mis siin oli
+    const now = Date.now();
 
     if (lapData.lastLap === null) {
       lapData.lastLap = now;
@@ -452,26 +429,25 @@ io.on("connection", (socket) => {
   socket.on("finishRace", () => {
     if (!socket.isAuthorized || socket.role !== "safety") return;
     finishRace()
-  }); //1.2.3
+  });
 
-  socket.on("endSession", () => {  //1.2.3
+  socket.on("endSession", () => {
     if (!socket.isAuthorized || socket.role !== "safety") return;
 
-    // End Session on lubatud ainult pärast FINISH'i //13.1 enne oli if (!state.raceEnded) return;
-    if (!state.currentSession && !state.sessions.length) return; //13.1 lubab sessionit lõpetada ilma race'ita ning erakorraliselt enne race'i lõppu.
+    // End Session on lubatud ainult pärast FINISH'i
+    if (!state.currentSession && !state.sessions.length) return; //Lubab sessionit lõpetada ilma race'ita ning erakorraliselt enne race'i lõppu.
 
-    if (state.currentSession) { // 4.1 (16 MAR) if cond add (kui race algas)
-      // state.lastFinishedSession = state.currentSession; - selle asemel vaja salvestada eelmise sõidu info
+    if (state.currentSession) {
       state.lastFinishedSession = {
-        id: state.currentSession.id, // salvestab session ID
-        drivers: state.currentSession.drivers.map(driver => ({ // kopeerib sõitjate info
+        id: state.currentSession.id, // Salvestab session ID
+        drivers: state.currentSession.drivers.map(driver => ({ // Kopeerib sõitjate info
           name: driver.name,
           carNumber: driver.carNumber
         })),
-        laps: {} // tühi objekt, kuhu eelmise sõidu info panna
+        laps: {} // Tühi objekt, kuhu eelmise sõidu info panna
       };
 
-      // copy lap data
+      // Copy lap data
       for (const carNumber in state.laps) {
         state.lastFinishedSession.laps[carNumber] = {
           driverName: state.laps[carNumber].driverName,
@@ -483,14 +459,14 @@ io.on("connection", (socket) => {
 
       state.currentSession = null;
     }
-    else if (state.sessions.length) { // 4.1 (16MAR) if cond add (kui session algas, aga race'i ei alustatud ja tahetakse session lõpetada. tehniline error vms)
+    else if (state.sessions.length) { // Kui session algas, aga race'i ei alustatud ja tahetakse session lõpetada. Tehniline error vms.
       state.lastFinishedSession = state.sessions.shift();
     }
 
     state.nextSession = state.sessions[0] || null;
     state.raceStarted = false;
     state.raceEnded = false;
-    state.raceMode = RACE_MODES.DANGER; //13.1 constants
+    state.raceMode = RACE_MODES.DANGER;
     state.timer = 0;
     state.laps = {};
 
@@ -500,20 +476,17 @@ io.on("connection", (socket) => {
     io.emit("stateUpdated", state);
   });
 
-  // 1.2.1 
-}); //1.2.2 tõstsin kõik evendid io.on(connection) alla
+});
 
-// 1.2.3 functionid s.t. timer jne peavad olema io.on(connection)-st eraldi
-// 1.2.3 veel pole jõudnud functione teha
 
 //////////////////////
 // Helper functions //
 //////////////////////
 
-// 1.2 check for car numbers (must be consecutive even when some drivers are deleted)
-function getAvailableCarNumber(drivers) {
 
-  for (let i = 1; i <= MAX_DRIVERS; i++) { //there can be 8 drivers //13.1 constants
+function getAvailableCarNumber(drivers) { // Check for car numbers (must be consecutive even when some drivers are deleted)
+
+  for (let i = 1; i <= MAX_DRIVERS; i++) { // There can be 8 drivers max
     const taken = drivers.some(d => d.carNumber === i);
     if (!taken) {
       return i;
@@ -523,10 +496,10 @@ function getAvailableCarNumber(drivers) {
 }
 
 function startTimer() {
-  const raceLength =      //7.1
+  const raceLength =
     process.env.NODE_ENV === "dev"
       ? TIMER.DEV
-      : TIMER.PROD; //13.1 constants
+      : TIMER.PROD;
 
   state.timer = raceLength;
 
@@ -539,12 +512,12 @@ function startTimer() {
 }
 
 function finishRace() {
-  if (state.raceEnded) return; //8.1
+  if (state.raceEnded) return;
 
   clearInterval(timerInterval);
-  timerInterval = null; //4.1 (16MAR) resetib timerintervali
+  timerInterval = null; // Resets timer interval
 
-  state.raceMode = RACE_MODES.FINISH; //13.1 constants
+  state.raceMode = RACE_MODES.FINISH;
   state.raceEnded = true;
 
   io.emit("raceFinished", state);
@@ -553,7 +526,7 @@ function finishRace() {
 }
 
 function setupLapTracking() {
-  state.laps = {};  //8.1
+  state.laps = {};
   state.currentSession.drivers.forEach(driver => {
     state.laps[driver.carNumber] = {
       driverName: driver.name,
