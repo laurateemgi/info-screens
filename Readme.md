@@ -58,7 +58,7 @@ The keys are defined in a `.env` file (not committed to the repository).
 
 ---
 
-## Local Setup
+## QUICK START - Local Setup 
 
 ### 1. Install dependencies
 npm install
@@ -66,30 +66,43 @@ npm install
 ### 2. Create `.env` file
 
 In the project root (`info-screens`), create a `.env` file:
+```
 RECEPTIONIST_KEY=yourkey
 SAFETY_KEY=yourkey
 OBSERVER_KEY=yourkey
+```
 
----
 
-## Running the Server
+## Running the Server (2 ways - A development, B production)
 
-### Development mode (short timer)
+### A Development mode (short timer - 60 seconds)
+Run:
+```
 npm run dev
-( Windows users first need to open package.json,
-swap line
-"dev": "NODE_ENV=dev node server.js"
-with
-"dev": "cross-env NODE_ENV=dev node server.js"
-Then in terminal:
-npm install cross-env --save --dev
-then
-npm run dev )
+```
+open http://localhost:3000/front-desk
 
-### Production mode (full timer)
+
+** Windows users (dev mode)**
+1. Install:
+```
+npm install cross-env --save --dev
+```
+2. Update `package.json` and replace `"dev": "NODE_ENV=dev node server.js"` with `"dev": "cross-env NODE_ENV=dev node server.js"`
+3. Run:
+```
+npm install cross-env --save --dev
+npm install cross-env --save --dev
+```
+
+### B Production mode (full timer - 600 seconds)
+```
 npm start
+```
 or
+```
 node server.js
+```
 
 ---
 
@@ -105,8 +118,7 @@ const PORT = process.env.PORT || 3000;
 
 ## Deployment
 The app is deployed on Railway. All clients connect to the same server instance → shared real-time state
-Live app: 
-```https://info-screens-production.up.railway.app/front-desk```
+** Live app: ** https://info-screens-production.up.railway.app/front-desk
 
 
 ## Application Routes
