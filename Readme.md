@@ -116,24 +116,32 @@ The keys are defined in a `.env` file (not committed to the repository).
 
 ## Interfaces & Responsibilities
 
-### Authenticated pages 
-These are aimed at Racetrack employees.
+### Authenticated Pages (Staff Only)
+
+These interfaces are used by racetrack employees.
+
 #### 1. Front Desk
-Create and manage race sessions, add / remove drivers, allows automatic car number assignment.
+- Create and manage race sessions  
+- Add / remove drivers  
+- Automatic car number assignment  
 
 #### 2. Race Control
-Start race, control race modes (Safe, Hazard, Danger, Finish) or end session.
+- Start and end races  
+- Control race modes: Safe, Hazard, Danger, Finish  
 
 #### 3. Lap Line Tracker
-Record laps per driver, updates leaderboard in real time
+- Record laps per driver  
+- Update leaderboard in real time  
 
-### Public Displays
-These screens **do not require authentication** and **show live race data to drivers or spectators**:
 
-* Leaderboard – live standings, lap count, fastest lap
-* Next Race – upcoming session and drivers
-* Race Countdown – remaining race time
-* Race Flags – current race flag (visual display)
+### Public Displays (No authentication required)
+
+These screens are visible to drivers and spectators.
+
+- **Leaderboard** – live standings, lap count, fastest lap  
+- **Next Race** – upcoming session and drivers  
+- **Race Countdown** – remaining race time  
+- **Race Flags** – current race flag (visual)  
 
 ---
 
