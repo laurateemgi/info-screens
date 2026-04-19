@@ -42,8 +42,8 @@ The keys are defined in a `.env` file (not committed to the repository).
 
 1. User sees an authentication screen  
 2. Enters access key  
-3. Frontend sends key to server: socket.emit("verifyKey", { role, key })
-4. Server validates and responds: (≈500ms delay): socket.emit("authResult", { success })
+3. Frontend sends key to server: `socket.emit("verifyKey", { role, key })`
+4. Server validates and responds: (≈500ms delay): `socket.emit("authResult", { success })`
 5. If valid → access granted  
    If invalid → error shown  
 
@@ -61,7 +61,9 @@ The keys are defined in a `.env` file (not committed to the repository).
 ## QUICK START - Local Setup 
 
 ### 1. Install dependencies
+```
 npm install
+```
 
 ### 2. Create `.env` file
 
@@ -73,9 +75,9 @@ OBSERVER_KEY=yourkey
 ```
 
 
-## Running the Server (2 ways - A development, B production)
+### 3. Running the Server (A development vs B production)
 
-### A Development mode (short timer - 60 seconds)
+#### A Development mode (short timer - 60 seconds)
 Run:
 ```
 npm run dev
@@ -83,7 +85,7 @@ npm run dev
 open http://localhost:3000/front-desk
 
 
-** Windows users (dev mode)**
+**Windows users (dev mode)**
 1. Install:
 ```
 npm install cross-env --save --dev
@@ -95,7 +97,7 @@ npm install cross-env --save --dev
 npm install cross-env --save --dev
 ```
 
-### B Production mode (full timer - 600 seconds)
+#### B Production mode (full timer - 600 seconds)
 ```
 npm start
 ```
@@ -118,7 +120,8 @@ const PORT = process.env.PORT || 3000;
 
 ## Deployment
 The app is deployed on Railway. All clients connect to the same server instance → shared real-time state
-** Live app: ** https://info-screens-production.up.railway.app/front-desk
+
+**Live app:** https://info-screens-production.up.railway.app/front-desk
 
 
 ## Application Routes
